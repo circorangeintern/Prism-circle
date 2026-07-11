@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum DeviceType {
+  ANDROID
+  IOS
+  WEB
+}
+
+model User {
+  id                  String         @id @default(uuid())
+  firstName           String
+  lastName            String
+  email               String         @unique
+  passwordHash        String
+  role                Role           @default(USER)
+  emailVerified       Boolean        @default(false)
+  notificationEnabled Boolean        @default(true)
+  latitude            Float?
+  longitude           Float?
+  countryId           Int?
+  stateId             Int?
+  lgaId               Int?
+  cityId              Int?
+  townId              Int?
+  neighborhoodId      Int?
+  country             Country?       @relation(fields: [countryId], references: [id])
+  state               State?         @relation(fields: [stateId], references: [id])
+  lga                 LGA?           @relation(fields: [lgaId], references: [id])
+  city                City?          @relation(fields: [cityId], references: [id])
+  town                Town?          @relation(fields: [townId], references: [id])
+  neighborhood        Neighborhood?  @relation(fields: [neighborhoodId], references: [id])
+  refreshTokens       RefreshToken[]
+  devices             Device[]
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Device {
+  id         String      @id @default(uuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceName String?
+  deviceType DeviceType?
+  fcmToken   String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@map("devices")
+}
+
+model Country {
+  id     Int     @id
+  name   String
+  states State[]
+  users  User[]
+
+  @@map("countries")
+}
+
+model State {
+  id        Int     @id
+  name      String
+  countryId Int
+  country   Country @relation(fields: [countryId], references: [id])
+  lgAs      LGA[]
+  users     User[]
+
+  @@map("states")
+}
+
+model LGA {
+  id      Int    @id
+  stateId Int
+  name    String
+  state   State  @relation(fields: [stateId], references: [id])
+  cities  City[]
+  users   User[]
+
+  @@map("lgas")
+}
+
+model City {
+  id     Int    @id
+  lgaId  Int
+  name   String
+  lga    LGA    @relation(fields: [lgaId], references: [id])
+  towns  Town[]
+  users  User[]
+
+  @@map("cities")
+}
+
+model Town {
+  id     Int    @id
+  cityId Int
+  name   String
+  city   City   @relation(fields: [cityId], references: [id])
+  neighborhoods Neighborhood[]
+  users  User[]
+
+  @@map("towns")
+}
+
+model Neighborhood {
+  id     Int    @id
+  townId Int
+  name   String
+  town   Town   @relation(fields: [townId], references: [id])
+  users  User[]
+
+  @@map("neighborhoods")
+}
