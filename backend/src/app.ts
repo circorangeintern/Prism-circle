@@ -34,14 +34,16 @@ export async function buildApp() {
     });
   }
 
-  await app.register(rateLimit, {
-    max: env.rateLimit.max,
-    timeWindow: env.rateLimit.windowMs,
-    errorResponseBuilder: () => ({
-      success: false,
-      message: 'Too many requests. Please try again later.',
-    }),
-  });
+  if (env.nodeEnv !== 'development') {
+    await app.register(rateLimit, {
+      max: env.rateLimit.max,
+      timeWindow: env.rateLimit.windowMs,
+      errorResponseBuilder: () => ({
+        success: false,
+        message: 'Too many requests. Please try again later.',
+      }),
+    });
+  }
 
   await app.register(swagger, swaggerOptions);
   await app.register(swaggerUi, swaggerUiOptions);
