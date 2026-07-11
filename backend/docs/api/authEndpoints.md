@@ -1,8 +1,8 @@
-# PowerWatch API Documentation
+# Authentication Endpoints
 
-## Authentication
+---
 
-### Register
+## Register
 
 Creates a new user account. Provide either the full location hierarchy (stateId, lgaId, cityId, townId, neighborhoodId) or GPS coordinates (latitude, longitude). The system auto-resolves coordinates via reverse geocoding.
 
@@ -42,15 +42,15 @@ Creates a new user account. Provide either the full location hierarchy (stateId,
 | neighborhoodId | Integer | Yes* | Existing neighborhood ID (must belong to the given town) |
 | latitude | Number | Yes* | GPS latitude (-90 to 90) |
 | longitude | Number | Yes* | GPS longitude (-180 to 180) |
-
-> *Required if providing location hierarchy OR coordinates. Provide either the full hierarchy (stateId through neighborhoodId) or GPS coordinates (latitude, longitude), not both.
 | notificationEnabled | Boolean | No | Push notification preference (defaults to true) |
 | deviceName | String | No | Device model name (max 100 characters) |
 | deviceType | Enum | No | Device platform: `ANDROID`, `IOS`, or `WEB` |
 
+> *Required if providing location hierarchy OR coordinates. Provide either the full hierarchy (stateId through neighborhoodId) or GPS coordinates (latitude, longitude), not both.
+
 ---
 
-### Request Example
+### Request Examples
 
 **Option 1: Full location hierarchy**
 ```json
@@ -180,77 +180,30 @@ Creates a new user account. Provide either the full location hierarchy (stateId,
 
 ---
 
-## Locations
+## Login (Coming Soon)
 
-### Reverse Geocode
+**Method:** `POST` **Endpoint:** `/api/v1/auth/login`
 
-Resolves GPS coordinates to the nearest country, state, LGA, city, town, and neighborhood using built-in proximity search.
+## Logout (Coming Soon)
 
-**Method:** `POST`
+**Method:** `POST` **Endpoint:** `/api/v1/auth/logout`
 
-**Endpoint:** `/api/v1/locations/reverse-geocode`
+## Refresh Token (Coming Soon)
 
-**Authentication:** Not required (Public endpoint)
+**Method:** `POST` **Endpoint:** `/api/v1/auth/refresh`
 
----
+## Forgot Password (Coming Soon)
 
-### Headers
+**Method:** `POST` **Endpoint:** `/api/v1/auth/forgot-password`
 
-| Header | Value | Required |
-|--------|-------|----------|
-| Content-Type | application/json | Yes |
-| Accept | application/json | Yes |
+## Reset Password (Coming Soon)
 
----
+**Method:** `POST` **Endpoint:** `/api/v1/auth/reset-password`
 
-### Parameters
+## Verify Email (Coming Soon)
 
-#### Body Parameters
+**Method:** `POST` **Endpoint:** `/api/v1/auth/verify-email`
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| latitude | Number | Yes | GPS latitude (-90 to 90) |
-| longitude | Number | Yes | GPS longitude (-180 to 180) |
+## Change Password (Coming Soon)
 
----
-
-### Request Example
-
-```json
-{
-  "latitude": 6.524379,
-  "longitude": 3.379206
-}
-```
-
----
-
-### Success Response
-
-**Status Code:** `200 OK`
-
-```json
-{
-  "success": true,
-  "message": "Location resolved successfully.",
-  "data": {
-    "countryId": 1,
-    "stateId": 25,
-    "lgaId": 210,
-    "cityId": 815,
-    "townId": 4200,
-    "neighborhoodId": 9012,
-    "distanceKm": 7.9
-  }
-}
-```
-
----
-
-### Possible Errors
-
-| Status Code | Description | Example Response |
-|-------------|-------------|-----------------|
-| 400 | Invalid coordinates | `{ "success": false, "message": "Validation failed.", "errors": [{ "field": "latitude", "message": "Latitude must be between -90 and 90." }] }` |
-| 404 | No location found | `{ "success": false, "message": "No location found for the given coordinates." }` |
-| 500 | Internal server error | `{ "success": false, "message": "Internal server error." }` |
+**Method:** `PUT` **Endpoint:** `/api/v1/auth/change-password`

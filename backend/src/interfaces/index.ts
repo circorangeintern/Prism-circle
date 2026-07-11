@@ -29,10 +29,16 @@ export interface UserResponse {
 
 export interface ReverseGeocodeResult {
   countryId: number;
+  country: string;
   stateId: number;
+  state: string;
   lgaId: number;
+  lga: string;
   cityId: number;
+  city: string;
   townId: number;
+  town: string;
   neighborhoodId: number;
+  neighborhood: string;
   distanceKm: number;
 }
