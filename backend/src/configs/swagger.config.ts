@@ -1,0 +1,41 @@
+import type { FastifyDynamicSwaggerOptions } from '@fastify/swagger';
+import type { FastifySwaggerUiOptions } from '@fastify/swagger-ui';
+import { env } from './env.config.js';
+
+export const swaggerOptions: FastifyDynamicSwaggerOptions = {
+  openapi: {
+    info: {
+      title: 'PowerWatch API',
+      description: 'Power outage tracking and reporting API documentation',
+      version: '1.0.0',
+      contact: {
+        name: 'PowerWatch Team',
+        email: 'support@powerwatch.com',
+      },
+    },
+    servers: [
+      {
+        url: `http://localhost:${env.port}`,
+        description: 'Development server',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Enter your JWT access token',
+        },
+      },
+    },
+  },
+};
+
+export const swaggerUiOptions: FastifySwaggerUiOptions = {
+  routePrefix: '/docs',
+  uiConfig: {
+    docExpansion: 'list',
+    deepLinking: true,
+  },
+};
