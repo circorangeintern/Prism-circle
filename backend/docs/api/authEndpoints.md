@@ -464,6 +464,475 @@ Reset a user password using a password reset OTP.
 
 ---
 
+## Verify Reset OTP
+
+Verify a password reset OTP code before allowing password change. This is a separate step from `verify-otp` to distinguish email verification from password reset authorization.
+
+**Method:** `POST`
+
+**Endpoint:** `/api/v1/auth/verify-reset-otp`
+
+**Authentication:** No
+
+---
+
+### Body Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| email | String | Yes | User email |
+| code | String | Yes | 6-digit OTP code |
+| type | Enum | No | Defaults to `PASSWORD_RESET` |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "OTP verified successfully.",
+  "data": {
+    "verified": true,
+    "type": "PASSWORD_RESET"
+  }
+}
+```
+
+---
+
+## Get My Profile
+
+Fetch the currently authenticated user's profile.
+
+**Method:** `GET`
+
+**Endpoint:** `/api/v1/auth/me`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Profile fetched successfully.",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "firstName": "Oluwayemi",
+    "lastName": "Oyinlola",
+    "email": "user@example.com",
+    "role": "USER",
+    "emailVerified": true,
+    "notificationEnabled": true,
+    "neighborhood": { "id": 9012, "name": "Ikeja GRA" },
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+}
+```
+
+---
+
+## Update Profile
+
+Update the authenticated user's profile information.
+
+**Method:** `PATCH`
+
+**Endpoint:** `/api/v1/auth/profile`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Body Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| firstName | String | No | New first name |
+| lastName | String | No | New last name |
+| notificationEnabled | Boolean | No | Push notification preference |
+| latitude | Number | No | GPS latitude (nullable) |
+| longitude | Number | No | GPS longitude (nullable) |
+| neighborhoodId | Integer | No | New neighborhood ID (nullable) |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Profile updated successfully.",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "firstName": "Oluwayemi",
+    "lastName": "Oyinlola"
+  }
+}
+```
+
+---
+
+## Change Password
+
+Change the authenticated user's password. Requires the current password for verification.
+
+**Method:** `PATCH`
+
+**Endpoint:** `/api/v1/auth/change-password`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Body Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| currentPassword | String | Yes | Current password |
+| newPassword | String | Yes | New password (min 8 chars) |
+| confirmNewPassword | String | No | Must match `newPassword` if present |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Password changed successfully.",
+  "data": {}
+}
+```
+
+> Changing the password revokes all existing refresh tokens and sessions except the current one.
+
+---
+
+## Update FCM Token
+
+Register or update a Firebase Cloud Messaging token for push notifications.
+
+**Method:** `PATCH`
+
+**Endpoint:** `/api/v1/auth/update-fcm-token`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Body Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| fcmToken | String | No | Firebase Cloud Messaging token |
+| deviceName | String | No | Device model name |
+| deviceType | Enum | No | `ANDROID`, `IOS`, or `WEB` |
+| browser | String | No | Browser name (e.g., "Chrome 120") |
+| platform | String | No | OS version (e.g., "iOS 17.2") |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "FCM token updated.",
+  "data": {}
+}
+```
+
+---
+
+## List Devices
+
+List all registered devices for the authenticated user.
+
+**Method:** `GET`
+
+**Endpoint:** `/api/v1/auth/devices`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Devices fetched successfully.",
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "deviceName": "iPhone 15 Pro",
+      "deviceType": "IOS",
+      "lastActive": "2025-06-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+## Remove Device
+
+Remove a registered device by ID.
+
+**Method:** `DELETE`
+
+**Endpoint:** `/api/v1/auth/devices/:deviceId`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| deviceId | String (UUID) | Yes | Device ID |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Device removed successfully.",
+  "data": {}
+}
+```
+
+---
+
+## List Sessions
+
+List all active sessions for the authenticated user.
+
+**Method:** `GET`
+
+**Endpoint:** `/api/v1/auth/sessions`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Sessions fetched successfully.",
+  "data": [
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440001",
+      "device": { "deviceName": "iPhone 15 Pro", "deviceType": "IOS" },
+      "ipAddress": "192.168.1.1",
+      "lastActivityAt": "2025-06-15T10:30:00.000Z",
+      "createdAt": "2025-06-14T08:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+## Revoke Session
+
+Revoke an active session by ID (soft revoke — marks `deleted_at`).
+
+**Method:** `DELETE`
+
+**Endpoint:** `/api/v1/auth/sessions/:sessionId`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| sessionId | String (UUID) | Yes | Session ID |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Session revoked successfully.",
+  "data": {}
+}
+```
+
+---
+
+## Logout All Devices
+
+Revoke all refresh tokens and sessions for the authenticated user.
+
+**Method:** `POST`
+
+**Endpoint:** `/api/v1/auth/logout-all`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Logged out of all devices.",
+  "data": {}
+}
+```
+
+---
+
+## Delete Account
+
+Permanently delete the authenticated user account. Requires password confirmation.
+
+**Method:** `DELETE`
+
+**Endpoint:** `/api/v1/auth/delete-account`
+
+**Authentication:** Yes (Bearer Token)
+
+---
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| Authorization | Bearer `<access_token>` | Yes |
+
+---
+
+### Body Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| password | String | Yes | Current password for confirmation |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Account deleted successfully.",
+  "data": {}
+}
+```
+
+---
+
 ## OTP Delivery and Validation
 
 PowerWatch supports OTPs for two use cases:
