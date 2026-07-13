@@ -1,22 +1,24 @@
 import bcrypt from 'bcryptjs';
 import { UserRepository } from '../../../repositories/user.repository.js';
 import { AuthRepository } from '../../../repositories/auth.repository.js';
+import { SessionRepository } from '../../../repositories/session.repository.js';
+import { DeviceRepository } from '../../../repositories/device.repository.js';
 import { AuditRepository } from '../../../repositories/audit.repository.js';
 import { AppError } from '../../../errors/index.js';
 import { MESSAGES } from '../../../constants/message.constant.js';
-import { env } from '../../../configs/env.config.js';
 
-export class ChangePasswordCommand {
+export class DeleteAccountCommand {
   constructor(
     private readonly userRepository: UserRepository = new UserRepository(),
     private readonly authRepository: AuthRepository = new AuthRepository(),
+    private readonly sessionRepository: SessionRepository = new SessionRepository(),
+    private readonly deviceRepository: DeviceRepository = new DeviceRepository(),
     private readonly auditRepository: AuditRepository = new AuditRepository(),
   ) {}
 
   async execute(
     userId: string,
-    currentPassword: string,
-    newPassword: string,
+    password: string,
     ipAddress?: string,
     userAgent?: string,
   ) {
@@ -25,28 +27,25 @@ export class ChangePasswordCommand {
       throw new AppError(404, MESSAGES.NOT_FOUND);
     }
 
-    const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+    const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
-      throw new AppError(400, 'Current password is incorrect.');
+      throw new AppError(400, 'Password is incorrect.');
     }
-
-    const isSame = await bcrypt.compare(newPassword, user.passwordHash);
-    if (isSame) {
-      throw new AppError(400, 'New password must be different from current password.');
-    }
-
-    const newHash = await bcrypt.hash(newPassword, env.bcrypt.saltRounds);
-    await this.userRepository.updatePasswordById(userId, newHash);
 
     await this.authRepository.revokeAllUserRefreshTokens(userId);
+    await this.sessionRepository.revokeAllByUserId(userId);
+    await this.deviceRepository.deleteByUserId(userId);
+    await this.userRepository.softDelete(userId);
 
     await this.auditRepository.create({
       userId,
-      action: 'PASSWORD_CHANGE',
+      action: 'ACCOUNT_DELETE',
+      entityType: 'User',
+      entityId: userId,
       ipAddress: ipAddress ?? null,
       userAgent: userAgent ?? null,
     });
 
-    return { message: 'Password changed successfully.' };
+    return { message: 'Account deleted successfully.' };
   }
 }

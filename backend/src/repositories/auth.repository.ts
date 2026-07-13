@@ -18,6 +18,13 @@ export class AuthRepository {
     return prisma.refreshToken.findUnique({ where: { id } });
   }
 
+  async findRefreshTokenByIdWithUser(id: string) {
+    return prisma.refreshToken.findUnique({
+      where: { id },
+      include: { user: true },
+    });
+  }
+
   async deleteRefreshToken(token: string) {
     return prisma.refreshToken.delete({ where: { token } });
   }
@@ -28,5 +35,18 @@ export class AuthRepository {
 
   async deleteAllUserRefreshTokens(userId: string) {
     return prisma.refreshToken.deleteMany({ where: { userId } });
+  }
+
+  async revokeAllUserRefreshTokens(userId: string) {
+    return prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+  }
+
+  async findAllByUserId(userId: string) {
+    return prisma.refreshToken.findMany({
+      where: { userId, revokedAt: null, expiresAt: { gt: new Date() } },
+    });
   }
 }
