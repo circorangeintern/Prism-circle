@@ -27,12 +27,10 @@ export async function buildApp() {
     },
   });
 
-  if (env.nodeEnv !== 'development') {
-    await app.register(cors, {
-      origin: env.cors.origin,
-      credentials: true,
-    });
-  }
+  await app.register(cors, {
+    origin: env.cors.origin,
+    credentials: true,
+  });
 
   await app.register(rateLimit, {
     max: env.rateLimit.max,

@@ -10,13 +10,13 @@ export const swaggerOptions: FastifyDynamicSwaggerOptions = {
       version: '1.0.0',
       contact: {
         name: 'PowerWatch Team',
-        email: 'support@powerwatch.com',
+        email: 'oyinlola.tech@icloud.com',
       },
     },
     servers: [
       {
         url: `http://localhost:${env.port}`,
-        description: 'Development server',
+        description: 'Local Server',
       },
     ],
     components: {

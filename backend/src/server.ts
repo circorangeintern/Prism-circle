@@ -7,8 +7,8 @@ import { ensureDatabaseExists } from './loaders/database.loader.js';
 import { seedAdmin } from './loaders/seed.loader.js';
 
 async function generatePrismaClient() {
-  const clientPath = new URL('../node_modules/@prisma/client/index.js', import.meta.url);
-  if (!existsSync(clientPath)) {
+  const generatedIndex = new URL('../node_modules/.prisma/client/index.js', import.meta.url);
+  if (!existsSync(generatedIndex)) {
     console.log('Prisma client not found. Generating...');
     execSync('npx prisma generate', { stdio: 'inherit' });
   }
@@ -19,7 +19,13 @@ async function main() {
 
   await ensureDatabaseExists();
 
-  execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+  if (env.nodeEnv === 'development') {
+    console.log('Running schema push (development)...');
+    execSync('npx prisma db push', { stdio: 'inherit' });
+  } else {
+    console.log('Running database migrations (production)...');
+    execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+  }
 
   await prisma.$connect();
   console.log('Database connected successfully.');
@@ -31,8 +37,8 @@ async function main() {
   await app.listen({ port: env.port, host: env.host });
 
   const address = app.server.address();
-  const host = typeof address === 'string' ? address : address?.address;
-  const port = typeof address === 'string' ? env.port : address?.port;
+  const host = address ? (typeof address === 'string' ? address : address.address) : env.host;
+  const port = address ? (typeof address === 'string' ? env.port : address.port) : env.port;
   console.log(`Server running at http://${host}:${port}`);
   console.log(`Swagger documentation at http://${host}:${port}/docs`);
 }

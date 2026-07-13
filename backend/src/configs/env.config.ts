@@ -28,8 +28,8 @@ export const env = {
   databaseUrl,
 
   jwt: {
-    accessSecret: process.env.JWT_ACCESS_SECRET ?? 'dev-access-secret',
-    refreshSecret: process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret',
+    accessSecret: process.env.JWT_ACCESS_SECRET ?? '',
+    refreshSecret: process.env.JWT_REFRESH_SECRET ?? '',
     accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? '15m',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '30d',
   },
@@ -39,7 +39,7 @@ export const env = {
   },
 
   rateLimit: {
-    max: Number(process.env.RATE_LIMIT_MAX) || 5,
+    max: Number(process.env.RATE_LIMIT_MAX) || 100,
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 60000,
   },
 
@@ -59,4 +59,25 @@ export const env = {
     privateKey: process.env.FIREBASE_PRIVATE_KEY ?? '',
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL ?? '',
   },
+
+  otp: {
+    expiryMinutes: Number(process.env.OTP_EXPIRY_MINUTES) || 10,
+  },
+
+  smtp: {
+    host: process.env.SMTP_HOST ?? '',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER ?? '',
+    pass: process.env.SMTP_PASS ?? '',
+    fromEmail: process.env.SMTP_FROM_EMAIL ?? '',
+    fromName: process.env.SMTP_FROM_NAME ?? 'PowerWatch',
+  },
 };
+
+const isProduction = env.nodeEnv === 'production';
+if (isProduction && (!env.jwt.accessSecret || !env.jwt.refreshSecret)) {
+  throw new Error(
+    'JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be set in production.',
+  );
+}

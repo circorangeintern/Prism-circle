@@ -1,6 +1,23 @@
 import { z } from 'zod';
 
 const deviceTypeEnum = z.enum(['ANDROID', 'IOS', 'WEB']);
+const otpTypeEnum = z.enum(['EMAIL_VERIFICATION', 'PASSWORD_RESET']);
+
+const emailSchema = z
+  .string({ message: 'Email is required.' })
+  .trim()
+  .toLowerCase()
+  .email('Invalid email address.')
+  .max(255, 'Email must not exceed 255 characters.');
+
+const passwordSchema = z
+  .string({ message: 'Password is required.' })
+  .min(8, 'Password must be at least 8 characters.')
+  .max(128, 'Password must not exceed 128 characters.')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter.')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter.')
+  .regex(/[0-9]/, 'Password must contain at least one number.')
+  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character.');
 
 export const registerSchema = z
   .object({
@@ -16,28 +33,14 @@ export const registerSchema = z
       .min(1, 'Last name is required.')
       .max(50, 'Last name must not exceed 50 characters.'),
 
-    email: z
-      .string({ message: 'Email is required.' })
-      .trim()
-      .toLowerCase()
-      .email('Invalid email address.')
-      .max(255, 'Email must not exceed 255 characters.'),
+    email: emailSchema,
 
-    password: z
-      .string({ message: 'Password is required.' })
-      .min(8, 'Password must be at least 8 characters.')
-      .max(128, 'Password must not exceed 128 characters.')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter.')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter.')
-      .regex(/[0-9]/, 'Password must contain at least one number.')
-      .regex(
-        /[^A-Za-z0-9]/,
-        'Password must contain at least one special character.',
-      ),
+    password: passwordSchema,
 
-    confirmPassword: z.string({
-      message: 'Confirm password is required.',
-    }),
+    confirmPassword: z
+      .string({ message: 'Confirm password is required.' })
+      .min(1, 'Confirm password is required.')
+      .optional(),
 
     countryId: z
       .number({ message: 'Country must be a number.' })
@@ -96,7 +99,7 @@ export const registerSchema = z
 
     deviceType: deviceTypeEnum.optional(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => !data.confirmPassword || data.password === data.confirmPassword, {
     message: 'Passwords do not match.',
     path: ['confirmPassword'],
   })
@@ -106,6 +109,13 @@ export const registerSchema = z
       data.lgaId !== undefined &&
       data.cityId !== undefined &&
       data.townId !== undefined &&
+      data.neighborhoodId !== undefined;
+
+    const hasPartialHierarchy =
+      data.stateId !== undefined ||
+      data.lgaId !== undefined ||
+      data.cityId !== undefined ||
+      data.townId !== undefined ||
       data.neighborhoodId !== undefined;
 
     const hasCoordinates =
@@ -120,14 +130,68 @@ export const registerSchema = z
       });
     }
 
-    if (hasFullHierarchy && hasCoordinates) {
+    if (hasPartialHierarchy && !hasFullHierarchy) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          'Provide either location IDs or GPS coordinates, not both.',
+          'When providing location IDs, all of stateId, lgaId, cityId, townId, and neighborhoodId are required.',
+        path: ['stateId'],
+      });
+    }
+
+    if (hasFullHierarchy && hasCoordinates) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Provide either location IDs or GPS coordinates, not both.',
         path: ['latitude'],
       });
     }
   });
 
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string({ message: 'Password is required.' }).min(1, 'Password is required.'),
+});
+
+export const refreshTokenSchema = z.object({
+  refreshToken: z.string({ message: 'Refresh token is required.' }).min(1, 'Refresh token is required.'),
+});
+
+export const sendOtpSchema = z.object({
+  email: emailSchema,
+  type: otpTypeEnum.optional(),
+});
+
+export const verifyOtpSchema = z.object({
+  email: emailSchema,
+  code: z.string({ message: 'OTP code is required.' }).trim().length(6, 'OTP code must be 6 digits.'),
+  type: otpTypeEnum.optional(),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+export const resetPasswordSchema = z
+  .object({
+    email: emailSchema,
+    code: z.string({ message: 'OTP code is required.' }).trim().length(6, 'OTP code must be 6 digits.'),
+    password: passwordSchema,
+    confirmPassword: z
+      .string({ message: 'Confirm password is required.' })
+      .min(1, 'Confirm password is required.')
+      .optional(),
+  })
+  .refine((data) => !data.confirmPassword || data.password === data.confirmPassword, {
+    message: 'Passwords do not match.',
+    path: ['confirmPassword'],
+  });
+
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
+export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
+export type SendOtpInput = z.infer<typeof sendOtpSchema>;
+export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type OtpType = z.infer<typeof otpTypeEnum>;

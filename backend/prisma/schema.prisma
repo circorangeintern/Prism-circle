@@ -134,3 +134,15 @@ model Neighborhood {
 
   @@map("neighborhoods")
 }
+
+model Otp {
+  id        String    @id @default(uuid())
+  email     String
+  code      String
+  type      String    @default("EMAIL_VERIFICATION")
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("otps")
+}

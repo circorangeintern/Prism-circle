@@ -14,8 +14,16 @@ export class AuthRepository {
     return prisma.refreshToken.findUnique({ where: { token } });
   }
 
+  async findRefreshTokenById(id: string) {
+    return prisma.refreshToken.findUnique({ where: { id } });
+  }
+
   async deleteRefreshToken(token: string) {
     return prisma.refreshToken.delete({ where: { token } });
+  }
+
+  async deleteRefreshTokenById(id: string) {
+    return prisma.refreshToken.delete({ where: { id } });
   }
 
   async deleteAllUserRefreshTokens(userId: string) {

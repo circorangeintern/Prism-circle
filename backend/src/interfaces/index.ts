@@ -41,4 +41,7 @@ export interface ReverseGeocodeResult {
   neighborhoodId: number;
   neighborhood: string;
   distanceKm: number;
+  suburb: string | null;
+  village: string | null;
+  road: string | null;
 }

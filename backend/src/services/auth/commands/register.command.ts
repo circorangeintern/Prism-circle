@@ -28,7 +28,12 @@ export class RegisterCommand {
       throw new AppError(409, MESSAGES.EMAIL_EXISTS);
     }
 
-    const hasFullHierarchy = dto.stateId !== undefined;
+    const hasFullHierarchy =
+      dto.stateId !== undefined &&
+      dto.lgaId !== undefined &&
+      dto.cityId !== undefined &&
+      dto.townId !== undefined &&
+      dto.neighborhoodId !== undefined;
 
     let countryId = dto.countryId;
     let stateId: number | undefined;
@@ -97,15 +102,21 @@ export class RegisterCommand {
         ]);
       }
     } else {
-      const geo = await this.reverseGeocodeQuery.execute(dto.latitude!, dto.longitude!);
+      if (dto.latitude === undefined || dto.longitude === undefined) {
+        throw new AppError(422, 'GPS coordinates are required when not using location hierarchy.', [
+          { field: 'latitude', message: 'Latitude is required.' },
+          { field: 'longitude', message: 'Longitude is required.' },
+        ]);
+      }
+      const geo = await this.reverseGeocodeQuery.execute(dto.latitude, dto.longitude);
       countryId = geo.countryId;
       stateId = geo.stateId;
       lgaId = geo.lgaId;
       cityId = geo.cityId;
       townId = geo.townId;
       neighborhoodId = geo.neighborhoodId;
-      latitude = dto.latitude!;
-      longitude = dto.longitude!;
+      latitude = dto.latitude;
+      longitude = dto.longitude;
     }
 
     const passwordHash = await bcrypt.hash(dto.password, env.bcrypt.saltRounds);
@@ -161,7 +172,12 @@ export class RegisterCommand {
     }).catch((error) => {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new AppError(409, MESSAGES.EMAIL_EXISTS);
+          const target = (error.meta as { target?: string[] } | undefined)?.target;
+          const isEmailConflict = target?.includes('email');
+          throw new AppError(
+            409,
+            isEmailConflict ? MESSAGES.EMAIL_EXISTS : 'A unique constraint conflict occurred.',
+          );
         }
       }
       throw error;
