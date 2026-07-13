@@ -187,6 +187,57 @@ export const resetPasswordSchema = z
     path: ['confirmPassword'],
   });
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string({ message: 'Current password is required.' }).min(1, 'Current password is required.'),
+    newPassword: passwordSchema,
+    confirmNewPassword: z
+      .string({ message: 'Confirm new password is required.' })
+      .min(1, 'Confirm new password is required.')
+      .optional(),
+  })
+  .refine((data) => !data.confirmNewPassword || data.newPassword === data.confirmNewPassword, {
+    message: 'Passwords do not match.',
+    path: ['confirmNewPassword'],
+  });
+
+export const updateProfileSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .min(1, 'First name is required.')
+    .max(50, 'First name must not exceed 50 characters.')
+    .optional(),
+  lastName: z
+    .string()
+    .trim()
+    .min(1, 'Last name is required.')
+    .max(50, 'Last name must not exceed 50 characters.')
+    .optional(),
+  notificationEnabled: z.boolean().optional(),
+  latitude: z.number().min(-90).max(90).optional().nullable(),
+  longitude: z.number().min(-180).max(180).optional().nullable(),
+  neighborhoodId: z.number().int().positive().optional().nullable(),
+});
+
+export const updateFcmTokenSchema = z.object({
+  fcmToken: z.string().min(1, 'FCM token is required.').optional(),
+  deviceName: z.string().max(100).optional().nullable(),
+  deviceType: deviceTypeEnum.optional().nullable(),
+  browser: z.string().max(100).optional().nullable(),
+  platform: z.string().max(50).optional().nullable(),
+});
+
+export const deleteAccountSchema = z.object({
+  password: z.string({ message: 'Password is required.' }).min(1, 'Password is required.'),
+});
+
+export const verifyResetOtpSchema = z.object({
+  email: emailSchema,
+  code: z.string({ message: 'OTP code is required.' }).trim().length(6, 'OTP code must be 6 digits.'),
+  type: otpTypeEnum.optional(),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
@@ -194,4 +245,9 @@ export type SendOtpInput = z.infer<typeof sendOtpSchema>;
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type UpdateFcmTokenInput = z.infer<typeof updateFcmTokenSchema>;
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;
+export type VerifyResetOtpInput = z.infer<typeof verifyResetOtpSchema>;
 export type OtpType = z.infer<typeof otpTypeEnum>;

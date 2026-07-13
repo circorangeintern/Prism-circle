@@ -8,6 +8,12 @@ import { swaggerOptions, swaggerUiOptions } from './configs/swagger.config.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 import { authRoutes } from './routes/auth.route.js';
 import { locationRoutes } from './routes/location.route.js';
+import { reportRoutes } from './routes/report.route.js';
+import { notificationRoutes } from './routes/notification.route.js';
+import { adminRoutes } from './routes/admin.route.js';
+import { analyticsRoutes } from './routes/analytics.route.js';
+import { historyRoutes } from './routes/history.route.js';
+import { healthRoutes } from './routes/health.route.js';
 
 export async function buildApp() {
   const app = Fastify({
@@ -54,6 +60,12 @@ export async function buildApp() {
 
   await app.register(authRoutes, { prefix: '/api/v1/auth' });
   await app.register(locationRoutes, { prefix: '/api/v1/locations' });
+  await app.register(reportRoutes, { prefix: '/api/v1/reports' });
+  await app.register(notificationRoutes, { prefix: '/api/v1/notifications' });
+  await app.register(adminRoutes, { prefix: '/api/v1/admin' });
+  await app.register(analyticsRoutes, { prefix: '/api/v1/analytics' });
+  await app.register(historyRoutes, { prefix: '/api/v1/history' });
+  await app.register(healthRoutes, { prefix: '/api/v1/health' });
 
   app.get('/health', async () => ({
     success: true,
