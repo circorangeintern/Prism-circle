@@ -24,16 +24,24 @@ export function signRefreshToken(payload: RefreshTokenPayload): string {
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload {
-  return jwt.verify(token, env.jwt.accessSecret) as AccessTokenPayload;
+  const payload = jwt.verify(token, env.jwt.accessSecret) as Record<string, unknown>;
+  if (typeof payload.userId !== 'string' || typeof payload.role !== 'string') {
+    throw new jwt.JsonWebTokenError('Invalid access token payload.');
+  }
+  return payload as unknown as AccessTokenPayload;
 }
 
 export function verifyRefreshToken(token: string): RefreshTokenPayload {
-  return jwt.verify(token, env.jwt.refreshSecret) as RefreshTokenPayload;
+  const payload = jwt.verify(token, env.jwt.refreshSecret) as Record<string, unknown>;
+  if (typeof payload.userId !== 'string' || typeof payload.tokenId !== 'string') {
+    throw new jwt.JsonWebTokenError('Invalid refresh token payload.');
+  }
+  return payload as unknown as RefreshTokenPayload;
 }
 
 export function getRefreshTokenExpiryDate(): Date {
   const expiresIn = env.jwt.refreshExpiresIn;
-  const match = expiresIn.match(/^(\d+)([dhms])$/);
+  const match = expiresIn.match(/^(\d+)\s*([dhms])$/);
   if (!match) return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
   const value = parseInt(match[1]!, 10);

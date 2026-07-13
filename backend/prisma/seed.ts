@@ -81,19 +81,18 @@ async function seedLocations(data: StateData[]) {
 
     const firstCityIdForState = lgaRecords.findIndex((l) => l.stateId === si + 1) + 1;
 
-    if (stateTowns.length === 0) {
-      townId++;
-      townRecords.push({
-        id: townId,
-        name: stateData.capital,
-        cityId: firstCityIdForState,
-      });
-    } else {
+    if (stateTowns.length > 0) {
       for (let ti = 0; ti < stateTowns.length; ti++) {
         townId++;
-        const cityIdx = ti % stateLgas.length;
-        const cityIdNum = firstCityIdForState + cityIdx;
+        const cityIndex = ti % stateLgas.length;
+        const cityIdNum = firstCityIdForState + cityIndex;
         townRecords.push({ id: townId, name: stateTowns[ti]!, cityId: cityIdNum });
+      }
+    } else {
+      for (let ci = 0; ci < stateLgas.length; ci++) {
+        townId++;
+        const cityIdNum = firstCityIdForState + ci;
+        townRecords.push({ id: townId, name: stateLgas[ci]!, cityId: cityIdNum });
       }
     }
   }

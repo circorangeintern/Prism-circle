@@ -27,24 +27,28 @@ export async function buildApp() {
     },
   });
 
-  if (env.nodeEnv !== 'development') {
-    await app.register(cors, {
-      origin: env.cors.origin,
-      credentials: true,
-    });
-  }
+  await app.register(cors, {
+    origin: env.cors.origin,
+    credentials: true,
+  });
 
   await app.register(rateLimit, {
     max: env.rateLimit.max,
     timeWindow: env.rateLimit.windowMs,
+    allowList: (request) => {
+      if (request.url.startsWith('/docs')) return true;
+      return false;
+    },
     errorResponseBuilder: () => ({
       success: false,
       message: 'Too many requests. Please try again later.',
     }),
   });
 
-  await app.register(swagger, swaggerOptions);
-  await app.register(swaggerUi, swaggerUiOptions);
+  if (env.nodeEnv !== 'production') {
+    await app.register(swagger, swaggerOptions);
+    await app.register(swaggerUi, swaggerUiOptions);
+  }
 
   app.setErrorHandler(errorHandler);
 

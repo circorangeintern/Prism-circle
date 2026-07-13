@@ -40,4 +40,18 @@ export class UserRepository {
   async create(data: Prisma.UserCreateInput) {
     return prisma.user.create({ data });
   }
+
+  async updatePassword(email: string, passwordHash: string) {
+    return prisma.user.update({
+      where: { email },
+      data: { passwordHash },
+    });
+  }
+
+  async markEmailVerified(email: string) {
+    return prisma.user.update({
+      where: { email },
+      data: { emailVerified: true },
+    });
+  }
 }
