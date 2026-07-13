@@ -1,5 +1,57 @@
 # Relationship Explanations
 
+## Auth Domain
+
+```mermaid
+erDiagram
+    User ||--o{ RefreshToken : "has"
+    User ||--o{ Device : "owns"
+    User ||--o{ Session : "has"
+    User ||--o{ Otp : "verifies"
+    User ||--o{ AuditLog : "initiates"
+    Session ||--o| RefreshToken : "uses"
+    Session }o--|| Device : "uses_optional"
+    User }o--|| User : "created_by/updated_by(self)"
+```
+
+## Location Hierarchy
+
+```mermaid
+erDiagram
+    Country ||--o{ State : "contains"
+    State ||--o{ LGA : "contains"
+    LGA ||--o{ City : "contains"
+    City ||--o{ Town : "contains"
+    Town ||--o{ Neighborhood : "contains"
+    User }o--|| Country : "resides_in"
+    User }o--|| State : "resides_in"
+    User }o--|| LGA : "resides_in"
+    User }o--|| City : "resides_in"
+    User }o--|| Town : "resides_in"
+    User }o--|| Neighborhood : "resides_in"
+```
+
+## Reports & Outages Domain
+
+```mermaid
+erDiagram
+    User ||--o{ Report : "submits"
+    Neighborhood ||--o{ Report : "has"
+    Neighborhood ||--o{ Outage : "has"
+    Outage ||--o{ OutageReport : "includes"
+    Report ||--o{ OutageReport : "linked_to"
+```
+
+## Analytics Domain
+
+```mermaid
+erDiagram
+    Neighborhood ||--o{ DailyReportSummary : "summarized_by"
+    Neighborhood ||--o{ WeeklyOutageSummary : "summarized_by"
+    Neighborhood ||--o{ MonthlyStatistics : "aggregated_in"
+    State ||--o{ MonthlyStatistics : "aggregated_in"
+```
+
 ## Entity Relationships
 
 | # | Relationship | Type | Cascade | Explanation |

@@ -290,42 +290,58 @@ erDiagram
 
 ## Architecture Diagram
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         API Layer (Fastify)                      │
-│                                                                  │
-│   Auth Routes        Report Routes     Admin Routes     etc.    │
-│        │                  │                │                     │
-│   ┌────┴────┐      ┌─────┴──────┐    ┌────┴──────┐              │
-│   │Controllers│     │Controllers │    │Controllers│              │
-│   └────┬────┘      └─────┬──────┘    └────┬──────┘              │
-│        │                  │                │                     │
-│   ┌────┴────┐      ┌─────┴──────┐    ┌────┴──────┐              │
-│   │Services │      │ Services   │    │ Services  │              │
-│   │(CQRS)   │      │ (CQRS)     │    │ (CQRS)    │              │
-│   └────┬────┘      └─────┬──────┘    └────┬──────┘              │
-└──────────────────────────┼──────────────────────────────────────┘
-                           │
-┌──────────────────────────┼──────────────────────────────────────┐
-│                    Prisma ORM Layer                              │
-│                                                                  │
-│   ┌──────────┬──────────┬──────────┬──────────┬──────────┐      │
-│   │  Auth    │ Location │ Reports │ Notif.  │Audit/Sum.│      │
-│   │ Models   │ Models   │ Models  │ Models  │ Models   │      │
-│   └────┬─────┴────┬─────┴────┬─────┴────┬─────┴────┬─────┘      │
-│        │          │          │          │          │            │
-│        └──────────┴──────────┼──────────┴──────────┘            │
-│                              │                                   │
-│                   ┌──────────┴──────────┐                       │
-│                   │  MySQL 8 Database   │                       │
-│                   │  (Partitioned)      │                       │
-│                   └─────────────────────┘                       │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph API["API Layer (Fastify)"]
+        direction TB
+        AR[Auth Routes] --> AC[Auth Controller]
+        RR[Report Routes] --> RC[Report Controller]
+        ADR[Admin Routes] --> ADC[Admin Controller]
+        NR[Notification Routes] --> NC[Notification Controller]
+        HR[Health Routes] --> HC[Health Controller]
+        AC --> AS[Auth Services<br/>CQRS]
+        RC --> RS[Report Services<br/>CQRS]
+        ADC --> ADS[Admin Services<br/>CQRS]
+        NC --> NS[Notification Services<br/>CQRS]
+        HC --> HS[Health Services]
+    end
 
-┌──────────────────────────────────────────────────────────────────┐
-│                    Auxiliary Services                            │
-│                                                                  │
-│   Redis Cache     Queue (RabbitMQ)    S3 (Audit Archive)        │
-│   Rate Limiter     Summary Workers    Firebase FCM              │
-└──────────────────────────────────────────────────────────────────┘
+    subgraph ORM["Prisma ORM Layer"]
+        direction TB
+        AM[Auth Models<br/>User, RefreshToken,<br/>Device, Session, Otp]
+        LM[Location Models<br/>Country, State, LGA,<br/>City, Town, Neighborhood]
+        RPM[Report Models<br/>Report, Outage,<br/>OutageReport]
+        NM[Notification Model<br/>NotificationLog]
+        ASM[Audit + Summary Models<br/>AuditLog, DailyReportSummary,<br/>WeeklyOutageSummary,<br/>MonthlyStatistic, RateLimit]
+    end
+
+    subgraph DB["MySQL 8 Database (Partitioned)"]
+        DB1[(reports<br/>partitioned by year)]
+        DB2[(audit_logs<br/>partitioned by year)]
+        DB3[(other tables)]
+    end
+
+    subgraph AUX["Auxiliary Services"]
+        REDIS[Redis Cache<br/>Rate Limiter]
+        QUEUE[Queue (RabbitMQ)<br/>Summary Workers]
+        S3[S3<br/>Audit Archive]
+        FCM[Firebase FCM]
+    end
+
+    AS --> AM
+    RS --> RPM
+    ADC --> ASM
+    NC --> NM
+    HS --> DB3
+
+    AM --> DB3
+    LM --> DB3
+    RPM --> DB1
+    NM --> DB3
+    ASM --> DB2
+
+    DB1 --> REDIS
+    DB2 --> S3
+    ASM --> QUEUE
+    NC --> FCM
 ```

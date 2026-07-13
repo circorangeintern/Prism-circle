@@ -1,5 +1,35 @@
 # Normalization Notes
 
+```mermaid
+flowchart LR
+    subgraph UNF["Unnormalized"]
+        U1["User( id, name, email,<br/>locations, reports... )"]
+    end
+
+    subgraph NF1["1NF — Atomic Columns"]
+        N1["User( id PK, name, email )<br/>Report( id PK, user_id FK,<br/>type, timestamp )"]
+    end
+
+    subgraph NF2["2NF — No Partial Dependencies"]
+        N2["User( id PK, name, email )<br/>OutageReport( id PK, outage_id FK,<br/>report_id FK )"]
+    end
+
+    subgraph NF3["3NF — No Transitive Dependencies"]
+        N3["User( id, name, email,<br/>neighborhood_id FK )<br/>Neighborhood( id PK, name,<br/>town_id FK )<br/>Town( id PK, name, city_id FK )"]
+    end
+
+    subgraph DENORM["Deliberate Denormalization"]
+        D1["outages.report_count<br/>(avoid COUNT scan)"]
+        D2["users.latitude/longitude<br/>(avoid 5-table join)"]
+        D3["daily_report_summaries<br/>(materialized from reports)"]
+        D4["weekly_outage_summaries<br/>(materialized from outages)"]
+        D5["monthly_statistics<br/>(rolled up from summaries)"]
+    end
+
+    UNF --> NF1 --> NF2 --> NF3
+    NF3 -.-> DENORM
+```
+
 ## 1NF Compliance
 - All columns are atomic (no arrays or nested objects — JSON only in `audit_logs.metadata` and `rate_limits` where intentional)
 - Every table has a single-column primary key (UUID)

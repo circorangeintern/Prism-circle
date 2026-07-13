@@ -1,5 +1,189 @@
 # Table Definitions
 
+```mermaid
+classDiagram
+    class User {
+        +String id PK
+        +String firstName
+        +String lastName
+        +String email UK
+        +String passwordHash
+        +Role role
+        +Boolean emailVerified
+        +Boolean notificationEnabled
+        +Float latitude?
+        +Float longitude?
+        +Int countryId FK?
+        +Int stateId FK?
+        +Int lgaId FK?
+        +Int cityId FK?
+        +Int townId FK?
+        +Int neighborhoodId FK?
+        +DateTime lastLoginAt?
+        +DateTime passwordChangedAt?
+        +String createdBy FK?
+        +String updatedBy FK?
+        +DateTime deletedAt?
+    }
+    class RefreshToken {
+        +String id PK
+        +String token UK
+        +String userId FK
+        +DateTime expiresAt
+        +DateTime revokedAt?
+    }
+    class Device {
+        +String id PK
+        +String userId FK
+        +String deviceName?
+        +DeviceType deviceType?
+        +String fcmToken?
+        +String browser?
+        +String platform?
+        +DateTime lastActive?
+    }
+    class Session {
+        +String id PK
+        +String userId FK
+        +String refreshTokenId FK?
+        +String deviceId FK?
+        +String ipAddress?
+        +String userAgent?
+        +Boolean isActive
+        +DateTime lastActivityAt
+        +DateTime expiresAt
+        +DateTime deletedAt?
+    }
+    class Otp {
+        +String id PK
+        +String email
+        +String code
+        +OtpType type
+        +Int attempts
+        +Int maxAttempts
+        +DateTime expiresAt
+        +DateTime usedAt?
+    }
+    class Country { +Int id PK; +String name }
+    class State { +Int id PK; +Int countryId FK; +String name }
+    class LGA { +Int id PK; +Int stateId FK; +String name }
+    class City { +Int id PK; +Int lgaId FK; +String name }
+    class Town { +Int id PK; +Int cityId FK; +String name }
+    class Neighborhood { +Int id PK; +Int townId FK; +String name }
+    class Report {
+        +String id PK
+        +String userId FK
+        +Int neighborhoodId FK
+        +ReportType reportType
+        +DateTime timestamp
+        +Float latitude?
+        +Float longitude?
+        +DeviceType deviceType?
+        +DateTime deletedAt?
+    }
+    class Outage {
+        +String id PK
+        +Int neighborhoodId FK
+        +DateTime startTime
+        +DateTime endTime?
+        +Int duration?
+        +Int reportCount
+    }
+    class OutageReport {
+        +String id PK
+        +String outageId FK
+        +String reportId FK
+    }
+    class NotificationLog {
+        +String id PK
+        +String userId FK
+        +String title
+        +String body
+        +String type?
+        +Boolean sent
+        +Boolean delivered
+        +Boolean opened
+        +Boolean clicked
+    }
+    class AuditLog {
+        +String id PK
+        +String userId FK?
+        +AuditAction action
+        +String entityType?
+        +String entityId?
+        +Json metadata?
+        +String ipAddress?
+        +String userAgent?
+    }
+    class DailyReportSummary {
+        +String id PK
+        +DateTime date
+        +Int neighborhoodId FK
+        +Int totalReports
+        +Int onReports
+        +Int offReports
+        +Int uniqueUsers
+    }
+    class WeeklyOutageSummary {
+        +String id PK
+        +DateTime weekStart
+        +Int neighborhoodId FK
+        +Int totalOutages
+        +Int totalDurationMin
+        +Float avgDurationMin
+        +Int maxDurationMin
+        +Int totalReports
+        +Int uniqueUsers
+    }
+    class MonthlyStatistic {
+        +String id PK
+        +DateTime monthStart
+        +Int neighborhoodId FK?
+        +Int stateId FK?
+        +Int totalReports
+        +Int onReports
+        +Int offReports
+        +Int totalOutages
+        +Int totalOutageMin
+        +Float avgOutageMin
+        +Int uniqueReporters
+    }
+    class RateLimit {
+        +String id PK
+        +String key
+        +String endpoint?
+        +DateTime windowStart
+        +Int requestCount
+    }
+
+    %% Auth domain
+    User "1" --> "*" RefreshToken : has
+    User "1" --> "*" Device : owns
+    User "1" --> "*" Session : has
+    User "1" --> "*" AuditLog : initiates
+    User "1" --> "*" NotificationLog : receives
+    Session "1" --> "1" RefreshToken : uses
+
+    %% Location hierarchy
+    Country "1" --> "*" State : contains
+    State "1" --> "*" LGA : contains
+    LGA "1" --> "*" City : contains
+    City "1" --> "*" Town : contains
+    Town "1" --> "*" Neighborhood : contains
+    User "*" --> "1" Neighborhood : resides_in
+
+    %% Reports domain
+    Neighborhood "1" --> "*" Report : has
+    Neighborhood "1" --> "*" Outage : has
+    Report "1" --> "*" OutageReport : linked_to
+    Outage "1" --> "*" OutageReport : includes
+
+    %% Summaries domain
+    Neighborhood "1" --> "*" DailyReportSummary : summarized_by
+    Neighborhood "1" --> "*" WeeklyOutageSummary : summarized_by
+    Neighborhood "1" --> "*" MonthlyStatistic : aggregated_in
+```
+
 ## `users` — Core Authentication & Profile
 
 | Column               | Type             | Constraints                        |

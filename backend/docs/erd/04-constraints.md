@@ -1,5 +1,43 @@
 # Constraints
 
+```mermaid
+flowchart TB
+    subgraph FK["Foreign Key Constraints"]
+        direction TB
+        UC[User] -- CASCADE --> RT[RefreshToken]
+        UC -- CASCADE --> DV[Device]
+        UC -- CASCADE --> RP[Report]
+        UC -- CASCADE --> NL[NotificationLog]
+        UC -- CASCADE --> SN[Session]
+        OG[Outage] -- CASCADE --> OR[OutageReport]
+        RP -- CASCADE --> OR
+        NH[Neighborhood] -- RESTRICT --> RP
+        NH -- RESTRICT --> OG
+    end
+
+    subgraph UK["Unique Constraints"]
+        direction TB
+        U1[users.email]
+        U2[refresh_tokens.token]
+        U3[outage_reports.outage_id + report_id]
+        U4[sessions.refresh_token_id]
+        U5[daily_report_summaries.date + neighborhood_id]
+        U6[weekly_outage_summaries.week_start + neighborhood_id]
+        U7[monthly_statistics.month_start + neighborhood_id + state_id]
+        U8[rate_limits.key + endpoint + window_start]
+    end
+
+    subgraph CK["Check Constraints"]
+        direction TB
+        C1[reports: timestamp <= created_at]
+        C2[outages: end_time > start_time]
+        C3[otps: attempts <= max_attempts]
+        C4[rate_limits: request_count >= 0]
+    end
+
+    FK --> UK --> CK
+```
+
 ## Referential Integrity
 
 | From | To | ON DELETE |

@@ -1,5 +1,55 @@
 # Prisma Modeling Recommendations
 
+## Soft-Delete Middleware Flow
+
+```mermaid
+sequenceDiagram
+    participant App as Application
+    participant MW as Prisma Middleware
+    participant DB as MySQL
+
+    Note over App,DB: findMany / findFirst
+    App->>MW: prisma.user.findMany()
+    MW->>MW: Inject where.deletedAt = null
+    MW->>DB: SELECT * FROM users WHERE deleted_at IS NULL
+    DB-->>MW: Results
+    MW-->>App: Filtered results
+
+    Note over App,DB: delete
+    App->>MW: prisma.user.delete(id)
+    MW->>MW: Change action to "update"
+    MW->>DB: UPDATE users SET deleted_at = NOW() WHERE id = ?
+    DB-->>MW: OK
+    MW-->>App: Updated record
+
+    Note over App,DB: deleteMany
+    App->>MW: prisma.user.deleteMany(where)
+    MW->>MW: Change action to "updateMany"
+    MW->>DB: UPDATE users SET deleted_at = NOW() WHERE ...
+    DB-->>MW: Count
+    MW-->>App: Updated count
+```
+
+## Migration Strategy
+
+```mermaid
+flowchart LR
+    subgraph DEV["Development"]
+        D1[Edit schema.prisma]
+        D2[npx prisma db push]
+        D1 --> D2
+    end
+
+    subgraph PROD["Production"]
+        P1[npx prisma migrate dev<br/>--name add_sessions]
+        P2[Review migration SQL]
+        P3[npx prisma migrate deploy]
+        P1 --> P2 --> P3
+    end
+
+    DEV -->|Commit migration files| PROD
+```
+
 ## Enum Definitions
 
 ```prisma
