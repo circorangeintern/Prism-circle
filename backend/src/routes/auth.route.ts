@@ -1,7 +1,9 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { authController } from '../controllers/auth.controller.js';
+import { authMiddleware } from '../middlewares/auth.middleware.js';
 
 export const authRoutes: FastifyPluginAsync = async (app) => {
+  // --- Public endpoints ---
   app.post('/register', {
     schema: {
       description:
@@ -223,7 +225,7 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
 
   app.post('/verify-otp', {
     schema: {
-      description: 'Verify a one-time code for email verification or password reset.',
+      description: 'Verify a one-time code for email verification.',
       tags: ['Auth'],
       summary: 'Verify OTP',
       body: {
@@ -254,6 +256,40 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       },
     },
   }, authController.verifyOtp);
+
+  app.post('/verify-reset-otp', {
+    schema: {
+      description: 'Verify a reset OTP before allowing password change.',
+      tags: ['Auth'],
+      summary: 'Verify reset OTP',
+      body: {
+        type: 'object',
+        required: ['email', 'code'],
+        properties: {
+          email: { type: 'string', format: 'email', example: 'user@example.com' },
+          code: { type: 'string', example: '123456' },
+          type: { type: 'string', enum: ['EMAIL_VERIFICATION', 'PASSWORD_RESET'], example: 'PASSWORD_RESET' },
+        },
+      },
+      response: {
+        200: {
+          description: 'OTP verified successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            message: { type: 'string', example: 'OTP verified successfully.' },
+            data: {
+              type: 'object',
+              properties: {
+                verified: { type: 'boolean', example: true },
+                type: { type: 'string', example: 'PASSWORD_RESET' },
+              },
+            },
+          },
+        },
+      },
+    },
+  }, authController.verifyResetOtp);
 
   app.post('/forgot-password', {
     schema: {
@@ -309,4 +345,266 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       },
     },
   }, authController.resetPassword);
+
+  // --- Authenticated endpoints ---
+  app.get('/me', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'Get the currently authenticated user profile.',
+      tags: ['Auth'],
+      summary: 'Get my profile',
+      security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          description: 'Profile fetched successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+  }, authController.getMe);
+
+  app.patch('/profile', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'Update the authenticated user profile information.',
+      tags: ['Auth'],
+      summary: 'Update profile',
+      security: [{ bearerAuth: [] }],
+      body: {
+        type: 'object',
+        properties: {
+          firstName: { type: 'string', example: 'Oluwayemi' },
+          lastName: { type: 'string', example: 'Oyinlola' },
+          notificationEnabled: { type: 'boolean' },
+          latitude: { type: 'number', nullable: true },
+          longitude: { type: 'number', nullable: true },
+          neighborhoodId: { type: 'integer', nullable: true },
+        },
+      },
+      response: {
+        200: {
+          description: 'Profile updated successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+  }, authController.updateProfile);
+
+  app.patch('/change-password', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'Change the authenticated user password.',
+      tags: ['Auth'],
+      summary: 'Change password',
+      security: [{ bearerAuth: [] }],
+      body: {
+        type: 'object',
+        required: ['currentPassword', 'newPassword'],
+        properties: {
+          currentPassword: { type: 'string', example: 'OldPassword@123' },
+          newPassword: { type: 'string', minLength: 8, example: 'NewPassword@456' },
+          confirmNewPassword: { type: 'string', example: 'NewPassword@456' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Password changed successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+  }, authController.changePassword);
+
+  app.patch('/update-fcm-token', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'Update or register a Firebase Cloud Messaging token for push notifications.',
+      tags: ['Auth'],
+      summary: 'Update FCM token',
+      security: [{ bearerAuth: [] }],
+      body: {
+        type: 'object',
+        properties: {
+          fcmToken: { type: 'string', example: 'fCMToken123...' },
+          deviceName: { type: 'string', example: 'iPhone 15 Pro' },
+          deviceType: { type: 'string', enum: ['ANDROID', 'IOS', 'WEB'] },
+          browser: { type: 'string', example: 'Chrome 120' },
+          platform: { type: 'string', example: 'iOS 17.2' },
+        },
+      },
+      response: {
+        200: {
+          description: 'FCM token updated',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+  }, authController.updateFcmToken);
+
+  app.get('/devices', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'List all registered devices for the authenticated user.',
+      tags: ['Auth'],
+      summary: 'List devices',
+      security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          description: 'Devices fetched successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'array', items: { type: 'object' } },
+          },
+        },
+      },
+    },
+  }, authController.getDevices);
+
+  app.delete('/devices/:deviceId', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'Remove a registered device.',
+      tags: ['Auth'],
+      summary: 'Remove device',
+      security: [{ bearerAuth: [] }],
+      params: {
+        type: 'object',
+        required: ['deviceId'],
+        properties: {
+          deviceId: { type: 'string', format: 'uuid', example: '550e8400-e29b-41d4-a716-446655440000' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Device removed successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+  }, authController.removeDevice);
+
+  app.get('/sessions', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'List all active sessions for the authenticated user.',
+      tags: ['Auth'],
+      summary: 'List sessions',
+      security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          description: 'Sessions fetched successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'array', items: { type: 'object' } },
+          },
+        },
+      },
+    },
+  }, authController.getSessions);
+
+  app.delete('/sessions/:sessionId', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'Revoke an active session.',
+      tags: ['Auth'],
+      summary: 'Revoke session',
+      security: [{ bearerAuth: [] }],
+      params: {
+        type: 'object',
+        required: ['sessionId'],
+        properties: {
+          sessionId: { type: 'string', format: 'uuid', example: '550e8400-e29b-41d4-a716-446655440000' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Session revoked successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+  }, authController.revokeSession);
+
+  app.post('/logout-all', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'Logout from all devices by revoking all refresh tokens and sessions.',
+      tags: ['Auth'],
+      summary: 'Logout all devices',
+      security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          description: 'Logged out of all devices',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+  }, authController.logoutAll);
+
+  app.delete('/delete-account', {
+    preHandler: [authMiddleware],
+    schema: {
+      description: 'Permanently delete the authenticated user account. Requires password confirmation.',
+      tags: ['Auth'],
+      summary: 'Delete account',
+      security: [{ bearerAuth: [] }],
+      body: {
+        type: 'object',
+        required: ['password'],
+        properties: {
+          password: { type: 'string', example: 'StrongPassword@123' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Account deleted successfully',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
+    },
+  }, authController.deleteAccount);
 };

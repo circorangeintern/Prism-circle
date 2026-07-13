@@ -29,6 +29,32 @@ export const MESSAGES = {
   NEIGHBORHOOD_NOT_FOUND: 'Neighborhood not found for the given town.',
   INVALID_LOCATION_HIERARCHY: 'Invalid location hierarchy.',
 
+  // Reports
+  REPORT_CREATED: 'Power report submitted successfully.',
+  REPORT_DELETED: 'Power report deleted successfully.',
+  REPORT_NOT_FOUND: 'Power report not found.',
+  REPORTS_FETCHED: 'Reports fetched successfully.',
+  REPORT_FETCHED: 'Report fetched successfully.',
+
+  // Live Status
+  LIVE_STATUS_FETCHED: 'Live status fetched successfully.',
+
+  // Outages
+  OUTAGE_STARTED: 'Power outage started.',
+  OUTAGE_ENDED: 'Power outage ended.',
+  OUTAGE_NOT_FOUND: 'Outage not found.',
+  OUTAGES_FETCHED: 'Outages fetched successfully.',
+
+  // Notifications
+  NOTIFICATION_SENT: 'Notification sent successfully.',
+  NOTIFICATION_DELETED: 'Notification deleted successfully.',
+  NOTIFICATION_NOT_FOUND: 'Notification not found.',
+  NOTIFICATIONS_FETCHED: 'Notifications fetched successfully.',
+  NOTIFICATION_FETCHED: 'Notification fetched successfully.',
+  NOTIFICATION_MARKED_READ: 'Notification marked as read.',
+  SUBSCRIBED: 'Subscribed to notifications successfully.',
+  UNSUBSCRIBED: 'Unsubscribed from notifications successfully.',
+
   // General
   INTERNAL_ERROR: 'Internal server error.',
   NOT_FOUND: 'Resource not found.',
