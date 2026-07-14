@@ -1,5 +1,50 @@
 # Recommended Indexes
 
+```mermaid
+flowchart LR
+    subgraph Auth["Auth Indexes"]
+        U_EMAIL[users.email UNIQUE]
+        RT_TOKEN[refresh_tokens.token UNIQUE]
+        RT_USER[refresh_tokens.user_id + expires_at]
+        S_USER[sessions.user_id + is_active]
+        S_EXP[sessions.expires_at]
+        D_USER[devices.user_id]
+        OTP_EMAIL[otps.email + type + expires_at]
+        OTP_USED[otps.email + type + used_at]
+    end
+
+    subgraph Reports["Report Indexes"]
+        R_NB[reports.neighborhood_id + timestamp]
+        R_USER[reports.user_id + timestamp]
+        R_TS[reports.timestamp]
+        R_TYPE[reports.report_type + timestamp]
+        R_DEL[reports.deleted_at]
+        O_NB[outages.neighborhood_id + start_time]
+        O_END[outages.end_time]
+    end
+
+    subgraph Analytics["Analytics Indexes"]
+        DRS_DATE[daily_report_summaries.date]
+        DRS_UNIQ[daily_report_summaries.date + neighborhood_id UNIQUE]
+        WOS_UNIQ[weekly_outage_summaries.week_start + neighborhood_id UNIQUE]
+        MS_UNIQ[monthly_statistics.month_start + neighborhood_id + state_id UNIQUE]
+    end
+
+    subgraph Audit["Audit Indexes"]
+        AL_ACTION[audit_logs.action + timestamp]
+        AL_ENTITY[audit_logs.entity_type + entity_id]
+        AL_USER[audit_logs.user_id + timestamp]
+    end
+
+    subgraph Infra["Infrastructure"]
+        RL_KEY[rate_limits.key + endpoint + window_start UNIQUE]
+    end
+
+    Auth --> Reports
+    Reports --> Analytics
+    Reports --> Audit
+```
+
 ## High-Priority (Query Performance)
 
 | Table | Index | Type | Why |

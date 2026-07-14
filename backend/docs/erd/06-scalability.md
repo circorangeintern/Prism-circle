@@ -1,5 +1,52 @@
 # Scalability Recommendations
 
+```mermaid
+flowchart TB
+    subgraph WRITE["Write Path"]
+        API[API Request] --> DB[(MySQL Primary)]
+        DB -->|Partition Pruning| P1[reports: p2024]
+        DB --> P2[reports: p2025]
+        DB --> P3[reports: p2026]
+        DB --> P4[audit_logs: partitions]
+    end
+
+    subgraph READ["Read Path"]
+        Q[Query] --> LB{Read or Write?}
+        LB -->|Read| RR[(Read Replica)]
+        LB -->|Write| DB
+        RR --> CACHE{In Cache?}
+        CACHE -->|Yes| REDIS[(Redis)]
+        CACHE -->|No| RR --> REDIS
+    end
+
+    subgraph SUMMARY["Summary Materialization"]
+        QUEUE[Queue / Cron] --> DW[Daily Summary<br/>every 5 min]
+        QUEUE --> WW[Weekly Summary<br/>every hour]
+        QUEUE --> MW[Monthly Summary<br/>every 6 hours]
+        DW --> DB
+        WW --> DB
+        MW --> DB
+    end
+
+    subgraph ARCHIVE["Archival"]
+        CRON[Cron Jobs] --> TTL1[notification_logs > 90d → DELETE]
+        CRON --> TTL2[rate_limits > 24h → DELETE]
+        CRON --> TTL3[otps > 48h → DELETE]
+        CRON --> AUDIT[audit_logs > 1y → S3 Archive]
+        AUDIT --> S3[(AWS S3)]
+    end
+
+    subgraph CACHE_TTL["Cache TTL Strategy"]
+        CT1[Live Status: 30s]
+        CT2[User Profile: 5min]
+        CT3[Dashboard: 1min]
+        CT4[Monthly Analytics: 15min]
+        CT5[Location Hierarchy: 1h]
+    end
+
+    REDIS --> CACHE_TTL
+```
+
 ## Partitioning Strategy
 
 | Table | Partition Key | Strategy | Notes |
