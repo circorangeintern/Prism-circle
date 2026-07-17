@@ -1,14 +1,29 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { reverseGeocodeSchema } from '../validators/location.validator.js';
 import { ReverseGeocodeQuery } from '../services/locations/queries/reverseGeocode.query.js';
+import { SearchLocationQuery } from '../services/locations/queries/searchLocation.query.js';
 import { successResponse } from '../utils/response.js';
 
 const reverseGeocodeQuery = new ReverseGeocodeQuery();
+const searchLocationQuery = new SearchLocationQuery();
 
 export const locationController = {
   async reverseGeocode(request: FastifyRequest, reply: FastifyReply) {
     const { latitude, longitude } = reverseGeocodeSchema.parse(request.body);
     const result = await reverseGeocodeQuery.execute(latitude, longitude);
     return reply.status(200).send(successResponse(result, 'Location resolved successfully.'));
+  },
+
+  async search(request: FastifyRequest, reply: FastifyReply) {
+    const { q } = request.query as { q?: string };
+    const limit = Number((request.query as { limit?: string }).limit) || 20;
+    if (!q || !q.trim()) {
+      return reply.status(400).send({
+        success: false,
+        message: 'Search query is required.',
+      });
+    }
+    const results = await searchLocationQuery.execute(q, Math.min(limit, 100));
+    return reply.status(200).send(successResponse(results, 'Locations found.'));
   },
 };

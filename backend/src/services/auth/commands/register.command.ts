@@ -5,6 +5,7 @@ import type { RegisterDto, RegisterResult } from '../../../interfaces/index.js';
 import { UserRepository } from '../../../repositories/user.repository.js';
 import { LocationRepository } from '../../../repositories/location.repository.js';
 import { AuthRepository } from '../../../repositories/auth.repository.js';
+import { AuditRepository } from '../../../repositories/audit.repository.js';
 import { AppError } from '../../../errors/index.js';
 import { MESSAGES } from '../../../constants/message.constant.js';
 import { prisma } from '../../../configs/database.config.js';
@@ -17,10 +18,15 @@ export class RegisterCommand {
     private readonly userRepository: UserRepository = new UserRepository(),
     private readonly locationRepository: LocationRepository = new LocationRepository(),
     private readonly authRepository: AuthRepository = new AuthRepository(),
+    private readonly auditRepository: AuditRepository = new AuditRepository(),
     private readonly reverseGeocodeQuery: ReverseGeocodeQuery = new ReverseGeocodeQuery(),
   ) {}
 
-  async execute(dto: RegisterDto): Promise<RegisterResult> {
+  async execute(
+    dto: RegisterDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<RegisterResult> {
     const normalizedEmail = dto.email.toLowerCase().trim();
 
     const existingUser = await this.userRepository.findByEmail(normalizedEmail);
@@ -28,7 +34,12 @@ export class RegisterCommand {
       throw new AppError(409, MESSAGES.EMAIL_EXISTS);
     }
 
-    const hasFullHierarchy = dto.stateId !== undefined;
+    const hasFullHierarchy =
+      dto.stateId !== undefined &&
+      dto.lgaId !== undefined &&
+      dto.cityId !== undefined &&
+      dto.townId !== undefined &&
+      dto.neighborhoodId !== undefined;
 
     let countryId = dto.countryId;
     let stateId: number | undefined;
@@ -97,15 +108,21 @@ export class RegisterCommand {
         ]);
       }
     } else {
-      const geo = await this.reverseGeocodeQuery.execute(dto.latitude!, dto.longitude!);
+      if (dto.latitude === undefined || dto.longitude === undefined) {
+        throw new AppError(422, 'GPS coordinates are required when not using location hierarchy.', [
+          { field: 'latitude', message: 'Latitude is required.' },
+          { field: 'longitude', message: 'Longitude is required.' },
+        ]);
+      }
+      const geo = await this.reverseGeocodeQuery.execute(dto.latitude, dto.longitude);
       countryId = geo.countryId;
       stateId = geo.stateId;
       lgaId = geo.lgaId;
       cityId = geo.cityId;
       townId = geo.townId;
       neighborhoodId = geo.neighborhoodId;
-      latitude = dto.latitude!;
-      longitude = dto.longitude!;
+      latitude = dto.latitude;
+      longitude = dto.longitude;
     }
 
     const passwordHash = await bcrypt.hash(dto.password, env.bcrypt.saltRounds);
@@ -146,6 +163,17 @@ export class RegisterCommand {
         },
       });
 
+      await tx.session.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: created.id,
+          refreshTokenId: tokenId,
+          ipAddress: ipAddress ?? null,
+          userAgent: userAgent ?? null,
+          expiresAt: refreshTokenExpiresAt,
+        },
+      });
+
       if (dto.deviceName || dto.deviceType) {
         await tx.device.create({
           data: {
@@ -161,10 +189,22 @@ export class RegisterCommand {
     }).catch((error) => {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new AppError(409, MESSAGES.EMAIL_EXISTS);
+          const target = (error.meta as { target?: string[] } | undefined)?.target;
+          const isEmailConflict = target?.includes('email');
+          throw new AppError(
+            409,
+            isEmailConflict ? MESSAGES.EMAIL_EXISTS : 'A unique constraint conflict occurred.',
+          );
         }
       }
       throw error;
+    });
+
+    await this.auditRepository.create({
+      userId: user.id,
+      action: 'REGISTER',
+      ipAddress: ipAddress ?? null,
+      userAgent: userAgent ?? null,
     });
 
     const accessToken = signAccessToken({

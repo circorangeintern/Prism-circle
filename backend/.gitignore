@@ -2,3 +2,5 @@ test
 .env
 node_modules
 dist
+datasets
+credentials
