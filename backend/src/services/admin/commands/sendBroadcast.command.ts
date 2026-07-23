@@ -47,13 +47,6 @@ export class SendBroadcastCommand {
       await this.notificationRepository.create(log);
     }
 
-    await this.firebaseSender.execute({
-      topic,
-      title: params.title,
-      body: params.body,
-      data: { broadcast: 'true' },
-    });
-
     return {
       totalUsers: uniqueUserIds.length,
       devicesFound: tokens.length,

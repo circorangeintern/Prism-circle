@@ -53,6 +53,15 @@ Get power reports aggregated by ISO week within a given month.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid query parameters |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Monthly History
@@ -80,17 +89,30 @@ Get power reports aggregated by month within a given year.
 
 ```json
 {
-  "year": 2026,
-  "months": [
-    {
-      "month": "2026-01",
-      "on": 100,
-      "off": 50,
-      "total": 150
-    }
-  ]
+  "success": true,
+  "message": "Monthly history fetched.",
+  "data": {
+    "year": 2026,
+    "months": [
+      {
+        "month": "2026-01",
+        "on": 100,
+        "off": 50,
+        "total": 150
+      }
+    ]
+  }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid query parameters |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -120,21 +142,34 @@ Get total outage minutes/hours for completed outages, broken down by neighborhoo
 
 ```json
 {
-  "totalOutages": 328,
-  "totalMinutes": 14760,
-  "totalHours": 246,
-  "averageMinutes": 45,
-  "byNeighborhood": [
-    {
-      "neighborhoodId": 9012,
-      "neighborhoodName": "Central",
-      "outageCount": 25,
-      "totalMinutes": 1500,
-      "totalHours": 25
-    }
-  ]
+  "success": true,
+  "message": "Outage hours fetched.",
+  "data": {
+    "totalOutages": 328,
+    "totalMinutes": 14760,
+    "totalHours": 246,
+    "averageMinutes": 45,
+    "byNeighborhood": [
+      {
+        "neighborhoodId": 9012,
+        "neighborhoodName": "Central",
+        "outageCount": 25,
+        "totalMinutes": 1500,
+        "totalHours": 25
+      }
+    ]
+  }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid query parameters |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -173,23 +208,36 @@ GET /api/v1/history/power-timeline?neighborhoodId=9012&startDate=2026-07-01T00:0
 
 ```json
 {
-  "neighborhoodId": 9012,
-  "interval": "day",
-  "startDate": "2026-07-01T00:00:00Z",
-  "endDate": "2026-07-07T23:59:59Z",
-  "timeline": [
-    {
-      "period": "2026-07-01",
-      "onCount": 5,
-      "offCount": 3,
-      "totalCount": 8
-    },
-    {
-      "period": "2026-07-02",
-      "onCount": 2,
-      "offCount": 7,
-      "totalCount": 9
-    }
-  ]
+  "success": true,
+  "message": "Power timeline fetched.",
+  "data": {
+    "neighborhoodId": 9012,
+    "interval": "day",
+    "startDate": "2026-07-01T00:00:00Z",
+    "endDate": "2026-07-07T23:59:59Z",
+    "timeline": [
+      {
+        "period": "2026-07-01",
+        "onCount": 5,
+        "offCount": 3,
+        "totalCount": 8
+      },
+      {
+        "period": "2026-07-02",
+        "onCount": 2,
+        "offCount": 7,
+        "totalCount": 9
+      }
+    ]
+  }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Missing required parameters (neighborhoodId, startDate, endDate) |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |

@@ -12,7 +12,7 @@ export class ForgotPasswordCommand {
     const normalizedEmail = email.toLowerCase().trim();
     const user = await this.userRepository.findByEmail(normalizedEmail);
     if (!user) {
-      throw new AppError(404, 'User not found.');
+      return;
     }
 
     await this.sendOtpCommand.execute(normalizedEmail, 'PASSWORD_RESET');

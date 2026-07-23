@@ -16,7 +16,8 @@ export const locationController = {
 
   async search(request: FastifyRequest, reply: FastifyReply) {
     const { q } = request.query as { q?: string };
-    const limit = Number((request.query as { limit?: string }).limit) || 20;
+    const limitInput = Number((request.query as { limit?: string }).limit);
+    const limit = Number.isFinite(limitInput) ? Math.min(Math.max(1, limitInput), 100) : 20;
     if (!q || !q.trim()) {
       return reply.status(400).send({
         success: false,

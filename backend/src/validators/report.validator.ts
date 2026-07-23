@@ -30,7 +30,7 @@ export const getReportsQuerySchema = z.object({
   neighborhoodId: z
     .string()
     .optional()
-    .transform((v) => (v ? Number(v) : undefined)),
+    .transform((v) => (v ? (isNaN(Number(v)) ? undefined : Number(v)) : undefined)),
   userId: z.string().uuid().optional(),
   reportType: reportTypeEnum.optional(),
   startDate: z.string().datetime().optional(),

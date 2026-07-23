@@ -72,6 +72,12 @@ Ping the database and return connection latency.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 500 | Internal server error |
+
 ---
 
 ## Firebase Health
@@ -99,3 +105,9 @@ Check Firebase initialization status.
   }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 500 | Internal server error |

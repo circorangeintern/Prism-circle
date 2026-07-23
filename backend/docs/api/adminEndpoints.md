@@ -37,6 +37,15 @@ Get summary counts for the admin dashboard.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Analytics
@@ -64,14 +73,28 @@ Get ON/OFF report counts, totals, and ratio within an optional date range.
 
 ```json
 {
-  "onReports": 800,
-  "offReports": 400,
-  "totalReports": 1200,
-  "totalUsers": 150,
-  "totalOutages": 340,
-  "onOffRatio": "2.00"
+  "success": true,
+  "message": "Analytics fetched.",
+  "data": {
+    "onReports": 800,
+    "offReports": 400,
+    "totalReports": 1200,
+    "totalUsers": 150,
+    "totalOutages": 340,
+    "onOffRatio": "2.00"
+  }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid date format |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -102,22 +125,36 @@ List all users with optional search and role filter.
 
 ```json
 {
-  "data": [
-    {
-      "id": "uuid",
-      "firstName": "John",
-      "lastName": "Doe",
-      "email": "john@example.com",
-      "role": "USER",
-      "emailVerified": true,
-      "notificationEnabled": true,
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "updatedAt": "2026-07-13T00:00:00.000Z"
-    }
-  ],
-  "pagination": { "page": 1, "limit": 20, "total": 150, "totalPages": 8 }
+  "success": true,
+  "message": "Users fetched.",
+  "data": {
+    "data": [
+      {
+        "id": "uuid",
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john@example.com",
+        "role": "USER",
+        "emailVerified": true,
+        "notificationEnabled": true,
+        "createdAt": "2026-01-01T00:00:00.000Z",
+        "updatedAt": "2026-07-13T00:00:00.000Z"
+      }
+    ],
+    "pagination": { "page": 1, "limit": 20, "total": 150, "totalPages": 8 }
+  }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid query parameters |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -130,6 +167,34 @@ Get all location hierarchy data (countries, states, LGAs, cities, towns, neighbo
 **Endpoint:** `/api/v1/admin/locations`
 
 **Authentication:** Bearer Token (Admin)
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Locations fetched.",
+  "data": {
+    "countries": [{ "id": 1, "name": "Nigeria" }],
+    "states": [{ "id": 25, "name": "Lagos", "countryId": 1 }],
+    "lgas": [{ "id": 210, "name": "Ikeja", "stateId": 25 }],
+    "cities": [{ "id": 815, "name": "Ikeja", "lgaId": 210 }],
+    "towns": [{ "id": 4200, "name": "Ikeja", "cityId": 815 }],
+    "neighborhoods": [{ "id": 9012, "name": "Ikeja GRA", "townId": 4200 }]
+  }
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -152,6 +217,35 @@ Update a location name.
 | type | Enum | Yes | `state`, `lga`, `city`, `town`, or `neighborhood` |
 | id | Integer | Yes | Location ID |
 | name | String | Yes | New name |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Location updated.",
+  "data": {
+    "id": 4200,
+    "type": "town",
+    "name": "New Town Name"
+  }
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid location type or missing fields |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 404 | Location not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -216,6 +310,16 @@ Send a push notification to all registered users.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Suspend User
@@ -235,6 +339,31 @@ Suspend a user: revokes all sessions, removes device tokens, disables notificati
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | userId | String (UUID) | Yes | User ID |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "User suspended.",
+  "data": {}
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid user ID |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -258,6 +387,31 @@ Permanently delete a user account.
 
 ---
 
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "User deleted.",
+  "data": {}
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid user ID |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
+---
+
 ## Delete Any Report
 
 Permanently delete any report by ID (admin override).
@@ -275,6 +429,31 @@ Permanently delete any report by ID (admin override).
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | id | String (UUID) | Yes | Report ID |
+
+---
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Report deleted.",
+  "data": {}
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid report ID |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 404 | Report not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -304,6 +483,16 @@ Compute and upsert daily report summaries for a given date. Populates `daily_rep
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid date format |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Materialize Weekly Summaries
@@ -332,6 +521,16 @@ Compute and upsert weekly outage summaries. Populates `weekly_outage_summaries` 
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid date format |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Materialize Monthly Statistics
@@ -359,3 +558,13 @@ Roll up daily and weekly summaries into monthly statistics. Populates `monthly_s
   }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid date format |
+| 401 | Unauthorized - missing or invalid token |
+| 403 | Forbidden - admin role required |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |

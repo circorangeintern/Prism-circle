@@ -202,6 +202,15 @@ Authenticate a user and return access and refresh tokens.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Invalid email or password |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Logout
@@ -235,6 +244,15 @@ Invalidate a refresh token.
   "data": {}
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed - missing refreshToken |
+| 401 | Invalid refresh token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -273,6 +291,15 @@ Refresh access and refresh tokens using a valid refresh token.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Invalid refresh token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Send OTP
@@ -308,6 +335,15 @@ Send a one-time code for email verification or password reset.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed or email already verified |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Resend OTP
@@ -342,6 +378,15 @@ Resend a previously requested OTP code.
   "data": {}
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed or email already verified |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -382,6 +427,14 @@ Verify a one-time code for email verification or password reset.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed or invalid or expired OTP |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Forgot Password
@@ -415,6 +468,15 @@ Request a password reset OTP.
   "data": {}
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -462,6 +524,14 @@ Reset a user password using a password reset OTP.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed or invalid or expired OTP |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Verify Reset OTP
@@ -500,6 +570,14 @@ Verify a password reset OTP code before allowing password change. This is a sepa
   }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed or invalid or expired OTP |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -544,6 +622,15 @@ Fetch the currently authenticated user's profile.
   }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -596,6 +683,16 @@ Update the authenticated user's profile information.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Change Password
@@ -641,6 +738,16 @@ Change the authenticated user's password. Requires the current password for veri
 ```
 
 > Changing the password revokes all existing refresh tokens and sessions except the current one.
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed, current password incorrect, or new password must be different |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -688,6 +795,15 @@ Register or update a Firebase Cloud Messaging token for push notifications.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## List Devices
@@ -728,6 +844,14 @@ List all registered devices for the authenticated user.
   ]
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -771,6 +895,16 @@ Remove a registered device by ID.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | Device not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## List Sessions
@@ -812,6 +946,14 @@ List all active sessions for the authenticated user.
   ]
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -855,6 +997,16 @@ Revoke an active session by ID (soft revoke — marks `deleted_at`).
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | Session not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Logout All Devices
@@ -888,6 +1040,14 @@ Revoke all refresh tokens and sessions for the authenticated user.
   "data": {}
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -930,6 +1090,16 @@ Permanently delete the authenticated user account. Requires password confirmatio
   "data": {}
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed or password is incorrect |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | User not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 

@@ -61,15 +61,15 @@ erDiagram
 
     model User {
         id UUID PK
-        firstName VARCHAR(50)
-        lastName VARCHAR(50)
-        email VARCHAR(255) UK
-        passwordHash VARCHAR(255)
-        role ENUM(USER ADMIN)
+        firstName VARCHAR
+        lastName VARCHAR
+        email VARCHAR UK
+        passwordHash VARCHAR
+        role ENUM
         emailVerified BOOLEAN
         notificationEnabled BOOLEAN
-        latitude DECIMAL(10,7) "nullable"
-        longitude DECIMAL(10,7) "nullable"
+        latitude DECIMAL "nullable"
+        longitude DECIMAL "nullable"
         countryId INT FK "nullable"
         stateId INT FK "nullable"
         lgaId INT FK "nullable"
@@ -87,7 +87,7 @@ erDiagram
 
     model RefreshToken {
         id UUID PK
-        token VARCHAR(512) UK
+        token VARCHAR UK
         userId UUID FK
         expiresAt DATETIME
         createdAt DATETIME
@@ -97,11 +97,11 @@ erDiagram
     model Device {
         id UUID PK
         userId UUID FK
-        deviceName VARCHAR(100) "nullable"
-        deviceType ENUM(ANDROID IOS WEB) "nullable"
+        deviceName VARCHAR "nullable"
+        deviceType ENUM "nullable"
         fcmToken TEXT "nullable"
-        browser VARCHAR(100) "nullable"
-        platform VARCHAR(50) "nullable"
+        browser VARCHAR "nullable"
+        platform VARCHAR "nullable"
         lastActive DATETIME "nullable"
         createdAt DATETIME
         updatedAt DATETIME
@@ -112,7 +112,7 @@ erDiagram
         userId UUID FK
         refreshTokenId UUID FK "nullable"
         deviceId UUID FK "nullable"
-        ipAddress VARCHAR(45) "nullable"
+        ipAddress VARCHAR "nullable"
         userAgent TEXT "nullable"
         isActive BOOLEAN
         lastActivityAt DATETIME
@@ -123,9 +123,9 @@ erDiagram
 
     model Otp {
         id UUID PK
-        email VARCHAR(255)
-        code VARCHAR(255) "hashed"
-        type ENUM(EMAIL_VERIFICATION PASSWORD_RESET)
+        email VARCHAR
+        code VARCHAR "hashed"
+        type ENUM
         attempts INT "default 0"
         maxAttempts INT "default 5"
         expiresAt DATETIME
@@ -134,22 +134,22 @@ erDiagram
         @@index(email type)
     }
 
-    model Country  { id INT PK; name VARCHAR(100); latitude DECIMAL(10,7) "nullable"; longitude DECIMAL(10,7) "nullable" }
-    model State    { id INT PK; countryId INT FK; name VARCHAR(100); latitude DECIMAL(10,7) "nullable"; longitude DECIMAL(10,7) "nullable" }
-    model LGA      { id INT PK; stateId INT FK; name VARCHAR(100); latitude DECIMAL(10,7) "nullable"; longitude DECIMAL(10,7) "nullable" }
-    model City     { id INT PK; lgaId INT FK; name VARCHAR(100); latitude DECIMAL(10,7) "nullable"; longitude DECIMAL(10,7) "nullable" }
-    model Town     { id INT PK; cityId INT FK; name VARCHAR(100); latitude DECIMAL(10,7) "nullable"; longitude DECIMAL(10,7) "nullable" }
-    model Neighborhood { id INT PK; townId INT FK; name VARCHAR(100); latitude DECIMAL(10,7) "nullable"; longitude DECIMAL(10,7) "nullable" }
+    model Country  { id INT PK; name VARCHAR; latitude DECIMAL "nullable"; longitude DECIMAL "nullable" }
+    model State    { id INT PK; countryId INT FK; name VARCHAR; latitude DECIMAL "nullable"; longitude DECIMAL "nullable" }
+    model LGA      { id INT PK; stateId INT FK; name VARCHAR; latitude DECIMAL "nullable"; longitude DECIMAL "nullable" }
+    model City     { id INT PK; lgaId INT FK; name VARCHAR; latitude DECIMAL "nullable"; longitude DECIMAL "nullable" }
+    model Town     { id INT PK; cityId INT FK; name VARCHAR; latitude DECIMAL "nullable"; longitude DECIMAL "nullable" }
+    model Neighborhood { id INT PK; townId INT FK; name VARCHAR; latitude DECIMAL "nullable"; longitude DECIMAL "nullable" }
 
     model Report {
         id UUID PK
         userId UUID FK
         neighborhoodId INT FK
-        reportType ENUM(ON OFF)
+        reportType ENUM
         timestamp DATETIME
-        latitude DECIMAL(10,7) "nullable"
-        longitude DECIMAL(10,7) "nullable"
-        deviceType ENUM(ANDROID IOS WEB) "nullable"
+        latitude DECIMAL "nullable"
+        longitude DECIMAL "nullable"
+        deviceType ENUM "nullable"
         createdAt DATETIME
         deletedAt DATETIME "nullable,soft-delete"
     }
@@ -175,9 +175,9 @@ erDiagram
     model NotificationLog {
         id UUID PK
         userId UUID FK
-        title VARCHAR(255)
+        title VARCHAR
         body TEXT
-        type VARCHAR(50) "nullable"
+        type VARCHAR "nullable"
         sent BOOLEAN
         delivered BOOLEAN
         opened BOOLEAN
@@ -192,11 +192,11 @@ erDiagram
     model AuditLog {
         id UUID PK
         userId UUID FK "nullable"
-        action VARCHAR(50)
-        entityType VARCHAR(50) "nullable"
-        entityId VARCHAR(36) "nullable"
+        action VARCHAR
+        entityType VARCHAR "nullable"
+        entityId VARCHAR "nullable"
         metadata JSON "nullable"
-        ipAddress VARCHAR(45) "nullable"
+        ipAddress VARCHAR "nullable"
         userAgent TEXT "nullable"
         timestamp DATETIME
     }
@@ -220,7 +220,7 @@ erDiagram
         neighborhoodId INT FK
         totalOutages INT
         totalDurationMinutes INT
-        avgDurationMinutes DECIMAL(10,2)
+        avgDurationMinutes DECIMAL
         maxDurationMinutes INT
         totalReports INT
         uniqueUsers INT
@@ -239,7 +239,7 @@ erDiagram
         offReports INT
         totalOutages INT
         totalOutageMinutes INT
-        avgOutageMinutes DECIMAL(10,2)
+        avgOutageMinutes DECIMAL
         uniqueReporters INT
         createdAt DATETIME
         updatedAt DATETIME
@@ -248,8 +248,8 @@ erDiagram
 
     model RateLimit {
         id UUID PK
-        key VARCHAR(255)
-        endpoint VARCHAR(100) "nullable"
+        key VARCHAR
+        endpoint VARCHAR "nullable"
         windowStart DATETIME
         requestCount INT
         createdAt DATETIME
@@ -323,7 +323,7 @@ flowchart TB
 
     subgraph AUX["Auxiliary Services"]
         REDIS[Redis Cache<br/>Rate Limiter]
-        QUEUE[Queue (RabbitMQ)<br/>Summary Workers]
+        QUEUE["Queue (RabbitMQ)<br/>Summary Workers"]
         S3[S3<br/>Audit Archive]
         FCM[Firebase FCM]
     end

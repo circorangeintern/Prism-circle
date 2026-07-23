@@ -101,6 +101,17 @@ export const notificationRoutes: FastifyPluginAsync = async (app) => {
           id: { type: 'string', format: 'uuid' },
         },
       },
+      response: {
+        200: {
+          description: 'Notification details',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, notificationController.getNotification);
 

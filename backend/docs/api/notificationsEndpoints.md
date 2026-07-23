@@ -69,6 +69,15 @@ Create an in-app notification for the authenticated user.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## List Notifications
@@ -126,6 +135,15 @@ Retrieve notifications for the authenticated user with pagination.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Unread Count
@@ -154,6 +172,14 @@ Get the count of unread notifications.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Get Single Notification
@@ -173,6 +199,39 @@ Retrieve a notification by ID.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | id | String (UUID) | Yes | Notification ID |
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Notification fetched successfully.",
+  "data": {
+    "id": "uuid",
+    "userId": "uuid",
+    "title": "Power Restored",
+    "body": "Power has been restored in your area.",
+    "sent": true,
+    "delivered": true,
+    "opened": false,
+    "clicked": false,
+    "sentAt": "2026-07-13T12:00:00.000Z",
+    "createdAt": "2026-07-13T12:00:00.000Z"
+  }
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid or missing notification ID |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | Notification not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -232,6 +291,16 @@ Mark a notification as opened and/or clicked with timestamps.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | Notification not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Delete Notification
@@ -265,6 +334,16 @@ Delete a notification by ID.
   "data": {}
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid or missing notification ID |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | Notification not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 

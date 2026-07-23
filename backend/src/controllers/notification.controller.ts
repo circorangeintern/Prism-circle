@@ -62,8 +62,8 @@ export const notificationController = {
     const { id } = notificationIdSchema.parse(request.params);
     const body = updateNotificationSchema.parse(request.body);
     const updates: { opened?: boolean; clicked?: boolean } = {};
-    if (body.opened) updates.opened = true;
-    if (body.clicked) updates.clicked = true;
+    if (body.opened !== undefined) updates.opened = body.opened;
+    if (body.clicked !== undefined) updates.clicked = body.clicked;
     const result = await markAsReadCommand.execute(id, updates);
     return reply.status(200).send(successResponse(result, NOTIFICATION_MESSAGES.NOTIFICATION_MARKED_READ));
   },
