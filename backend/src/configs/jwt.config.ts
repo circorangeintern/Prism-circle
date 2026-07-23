@@ -41,19 +41,41 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload {
 
 export function getRefreshTokenExpiryDate(): Date {
   const expiresIn = env.jwt.refreshExpiresIn;
-  const match = expiresIn.match(/^(\d+)\s*([dhms])$/);
-  if (!match) return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-  const value = parseInt(match[1]!, 10);
-  const unit = match[2]!;
+  // Handle numeric strings (seconds)
+  const numericMatch = expiresIn.match(/^(\d+)$/);
+  if (numericMatch) {
+    return new Date(Date.now() + parseInt(numericMatch[1]!, 10) * 1000);
+  }
 
-  const multipliers: Record<string, number> = {
-    d: 24 * 60 * 60 * 1000,
-    h: 60 * 60 * 1000,
-    m: 60 * 1000,
-    s: 1000,
-  };
+  // Handle formats like "30d", "15m", "1h", "45s"
+  const shortMatch = expiresIn.match(/^(\d+)\s*([dhms])$/);
+  if (shortMatch) {
+    const value = parseInt(shortMatch[1]!, 10);
+    const unit = shortMatch[2]!;
+    const multipliers: Record<string, number> = {
+      d: 24 * 60 * 60 * 1000,
+      h: 60 * 60 * 1000,
+      m: 60 * 1000,
+      s: 1000,
+    };
+    return new Date(Date.now() + value * (multipliers[unit] ?? 30 * 24 * 60 * 60 * 1000));
+  }
 
-  const multiplier = multipliers[unit] ?? 30 * 24 * 60 * 60 * 1000;
-  return new Date(Date.now() + value * multiplier);
+  // Handle formats like "7 days", "2 hours", "30 minutes", "45 seconds"
+  const longMatch = expiresIn.match(/^(\d+)\s*(day|hour|minute|second)s?$/);
+  if (longMatch) {
+    const value = parseInt(longMatch[1]!, 10);
+    const unit = longMatch[2]!;
+    const multipliers: Record<string, number> = {
+      day: 24 * 60 * 60 * 1000,
+      hour: 60 * 60 * 1000,
+      minute: 60 * 1000,
+      second: 1000,
+    };
+    return new Date(Date.now() + value * (multipliers[unit] ?? 30 * 24 * 60 * 60 * 1000));
+  }
+
+  // Default fallback: 30 days
+  return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 }

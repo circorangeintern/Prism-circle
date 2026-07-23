@@ -17,7 +17,7 @@ export class SendOtpCommand {
     const normalizedEmail = email.toLowerCase().trim();
     const user = await this.userRepository.findByEmail(normalizedEmail);
     if (!user) {
-      throw new AppError(404, 'User not found.');
+      return;
     }
 
     if (type === 'EMAIL_VERIFICATION' && user.emailVerified) {

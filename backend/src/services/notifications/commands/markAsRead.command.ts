@@ -14,13 +14,13 @@ export class MarkAsReadCommand {
     }
 
     const data: Record<string, unknown> = {};
-    if (updates.opened) {
-      data.opened = true;
-      data.openedAt = new Date();
+    if (updates.opened !== undefined) {
+      data.opened = updates.opened;
+      if (updates.opened) data.openedAt = new Date();
     }
-    if (updates.clicked) {
-      data.clicked = true;
-      data.clickedAt = new Date();
+    if (updates.clicked !== undefined) {
+      data.clicked = updates.clicked;
+      if (updates.clicked) data.clickedAt = new Date();
     }
 
     return this.notificationRepository.update(id, data);

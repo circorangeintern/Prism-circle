@@ -9,6 +9,9 @@ export class DeleteUserCommand {
       throw new AppError(404, MESSAGES.NOT_FOUND);
     }
 
-    await prisma.user.delete({ where: { id: userId } });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { deletedAt: new Date() },
+    });
   }
 }

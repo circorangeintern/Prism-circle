@@ -17,6 +17,17 @@ export const analyticsRoutes: FastifyPluginAsync = async (app) => {
           endDate: { type: 'string', format: 'date-time' },
         },
       },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, analyticsController.getPowerStatistics);
 
@@ -32,6 +43,17 @@ export const analyticsRoutes: FastifyPluginAsync = async (app) => {
           endDate: { type: 'string', format: 'date-time' },
         },
       },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, analyticsController.getOutageStatistics);
 
@@ -40,6 +62,17 @@ export const analyticsRoutes: FastifyPluginAsync = async (app) => {
       description: 'Get user statistics (totals, verification rate, top reporters).',
       tags: ['Analytics'],
       summary: 'User statistics',
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, analyticsController.getUserStatistics);
 
@@ -48,6 +81,17 @@ export const analyticsRoutes: FastifyPluginAsync = async (app) => {
       description: 'Get location statistics (report/outage/user counts per neighborhood).',
       tags: ['Analytics'],
       summary: 'Location statistics',
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, analyticsController.getLocationStatistics);
 };

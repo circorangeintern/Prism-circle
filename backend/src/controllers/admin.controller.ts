@@ -1,4 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
+import { z } from 'zod';
 import { GetDashboardQuery } from '../services/admin/queries/getDashboard.query.js';
 import { GetAnalyticsQuery } from '../services/admin/queries/getAnalytics.query.js';
 import { GetUsersQuery } from '../services/admin/queries/getUsers.query.js';
@@ -61,7 +62,12 @@ export const adminController = {
   },
 
   async updateLocation(request: FastifyRequest, reply: FastifyReply) {
-    const { type, id, name } = request.body as { type: 'state' | 'lga' | 'city' | 'town' | 'neighborhood'; id: number; name: string };
+    const updateLocationSchema = z.object({
+      type: z.enum(['state', 'lga', 'city', 'town', 'neighborhood']),
+      id: z.number().int().positive(),
+      name: z.string().trim().min(1).max(100),
+    });
+    const { type, id, name } = updateLocationSchema.parse(request.body);
     const result = await updateLocationCommand.execute({ type, id, name });
     return reply.status(200).send(successResponse(result, 'Location updated.'));
   },
@@ -94,19 +100,22 @@ export const adminController = {
 
   async materializeDaily(request: FastifyRequest, reply: FastifyReply) {
     const { date } = request.query as { date?: string };
-    const result = await materializeDailyCommand.execute(date ? new Date(date) : undefined);
+    const parsed = date ? new Date(date) : undefined;
+    const result = await materializeDailyCommand.execute(parsed && !isNaN(parsed.getTime()) ? parsed : undefined);
     return reply.status(200).send(successResponse(result, 'Daily summaries materialized.'));
   },
 
   async materializeWeekly(request: FastifyRequest, reply: FastifyReply) {
     const { weekStart } = request.query as { weekStart?: string };
-    const result = await materializeWeeklyCommand.execute(weekStart ? new Date(weekStart) : undefined);
+    const parsed = weekStart ? new Date(weekStart) : undefined;
+    const result = await materializeWeeklyCommand.execute(parsed && !isNaN(parsed.getTime()) ? parsed : undefined);
     return reply.status(200).send(successResponse(result, 'Weekly summaries materialized.'));
   },
 
   async materializeMonthly(request: FastifyRequest, reply: FastifyReply) {
     const { monthStart } = request.query as { monthStart?: string };
-    const result = await materializeMonthlyCommand.execute(monthStart ? new Date(monthStart) : undefined);
+    const parsed = monthStart ? new Date(monthStart) : undefined;
+    const result = await materializeMonthlyCommand.execute(parsed && !isNaN(parsed.getTime()) ? parsed : undefined);
     return reply.status(200).send(successResponse(result, 'Monthly summaries materialized.'));
   },
 };

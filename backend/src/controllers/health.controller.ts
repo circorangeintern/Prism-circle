@@ -12,8 +12,9 @@ export const healthController = {
   async healthCheck(_request: FastifyRequest, reply: FastifyReply) {
     const result = await healthCheckQuery.execute();
     const isHealthy = result.database.status === 'healthy';
-    return reply.status(isHealthy ? 200 : 503).send({
-      success: isHealthy,
+    const statusCode = isHealthy ? 200 : 503;
+    return reply.status(statusCode).send({
+      success: true,
       message: isHealthy ? 'All systems healthy.' : 'Some systems are unhealthy.',
       data: result,
     });

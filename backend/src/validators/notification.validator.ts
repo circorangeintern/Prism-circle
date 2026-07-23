@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 export const createNotificationSchema = z.object({
-  userId: z.string({ message: 'User ID is required.' }).uuid('Invalid user ID.'),
   title: z
     .string({ message: 'Title is required.' })
     .trim()
@@ -36,7 +35,6 @@ export const notificationIdSchema = z.object({
 });
 
 export const updateNotificationSchema = z.object({
-  delivered: z.boolean().optional(),
   opened: z.boolean().optional(),
   clicked: z.boolean().optional(),
 });

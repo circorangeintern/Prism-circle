@@ -18,6 +18,17 @@ export const historyRoutes: FastifyPluginAsync = async (app) => {
           month: { type: 'integer' },
         },
       },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, historyController.getWeeklyHistory);
 
@@ -31,6 +42,17 @@ export const historyRoutes: FastifyPluginAsync = async (app) => {
         properties: {
           neighborhoodId: { type: 'integer' },
           year: { type: 'integer' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
         },
       },
     },
@@ -49,6 +71,17 @@ export const historyRoutes: FastifyPluginAsync = async (app) => {
           endDate: { type: 'string', format: 'date-time' },
         },
       },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, historyController.getOutageHours);
 
@@ -65,6 +98,17 @@ export const historyRoutes: FastifyPluginAsync = async (app) => {
           startDate: { type: 'string', format: 'date-time' },
           endDate: { type: 'string', format: 'date-time' },
           interval: { type: 'string', enum: ['hour', 'day'], default: 'day' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
         },
       },
     },

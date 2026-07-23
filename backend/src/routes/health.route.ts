@@ -33,6 +33,17 @@ export const healthRoutes: FastifyPluginAsync = async (app) => {
       description: 'Database health check (connection latency).',
       tags: ['Health'],
       summary: 'Database health',
+      response: {
+        200: {
+          description: 'Database health status',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, healthController.databaseHealth);
 
@@ -41,6 +52,17 @@ export const healthRoutes: FastifyPluginAsync = async (app) => {
       description: 'Firebase health check (initialization status).',
       tags: ['Health'],
       summary: 'Firebase health',
+      response: {
+        200: {
+          description: 'Database health status',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, healthController.firebaseHealth);
 };

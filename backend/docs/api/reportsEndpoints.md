@@ -108,6 +108,16 @@ Convenience endpoint equivalent to `POST /api/v1/reports` with `reportType` set 
 | deviceType | Enum | No | `ANDROID`, `IOS`, `WEB` |
 | timestamp | String | No | ISO 8601 datetime |
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 422 | Neighborhood not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Report Power On
@@ -125,6 +135,16 @@ Convenience endpoint equivalent to `POST /api/v1/reports` with `reportType` set 
 ### Body Parameters
 
 Same as Report Power Off.
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 422 | Neighborhood not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -207,6 +227,47 @@ Get the authenticated user's reports.
 | page | Integer | No | Page number (default 1) |
 | limit | Integer | No | Results per page (default 20) |
 
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Reports fetched successfully.",
+  "data": {
+    "data": [
+      {
+        "id": "uuid",
+        "userId": "uuid",
+        "neighborhoodId": 9012,
+        "reportType": "OFF",
+        "timestamp": "2026-07-13T12:00:00.000Z",
+        "latitude": null,
+        "longitude": null,
+        "deviceType": "ANDROID",
+        "createdAt": "2026-07-13T12:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 50,
+      "totalPages": 3
+    }
+  }
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Reports by Location
@@ -228,6 +289,47 @@ Get reports filtered by neighborhood ID.
 | neighborhoodId | Integer | Yes | Neighborhood ID |
 | page | Integer | No | Page number (default 1) |
 | limit | Integer | No | Results per page (default 20) |
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Reports fetched successfully.",
+  "data": {
+    "data": [
+      {
+        "id": "uuid",
+        "userId": "uuid",
+        "neighborhoodId": 9012,
+        "reportType": "OFF",
+        "timestamp": "2026-07-13T12:00:00.000Z",
+        "latitude": null,
+        "longitude": null,
+        "deviceType": "ANDROID",
+        "createdAt": "2026-07-13T12:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 50,
+      "totalPages": 3
+    }
+  }
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Missing or invalid neighborhoodId |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -273,6 +375,15 @@ Get real-time power status for a neighborhood.
 ```
 
 **Confidence Score:** Percentage of reports submitted in the last hour relative to total reports for the neighborhood.
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Missing neighborhoodId parameter |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -330,6 +441,15 @@ Retrieve outage records with optional filters.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Validation failed |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Get Single Outage
@@ -350,6 +470,47 @@ Retrieve a single outage with its associated reports.
 |-----------|------|----------|-------------|
 | id | String (UUID) | Yes | Outage ID |
 
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Outage fetched.",
+  "data": {
+    "id": "uuid",
+    "neighborhoodId": 9012,
+    "neighborhood": { "id": 9012, "name": "Central" },
+    "startTime": "2026-07-13T10:00:00.000Z",
+    "endTime": null,
+    "duration": null,
+    "reportCount": 5,
+    "createdAt": "2026-07-13T10:00:00.000Z",
+    "outageReports": [
+      {
+        "report": {
+          "id": "uuid",
+          "reportType": "OFF",
+          "timestamp": "2026-07-13T10:00:00.000Z",
+          "userId": "uuid"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid or missing outage ID |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | Outage not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Get Single Report
@@ -369,6 +530,38 @@ Retrieve a single power report by ID.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | id | String (UUID) | Yes | Report ID |
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Report fetched successfully.",
+  "data": {
+    "id": "uuid",
+    "userId": "uuid",
+    "neighborhoodId": 9012,
+    "reportType": "OFF",
+    "timestamp": "2026-07-13T12:00:00.000Z",
+    "latitude": null,
+    "longitude": null,
+    "deviceType": "ANDROID",
+    "createdAt": "2026-07-13T12:00:00.000Z"
+  }
+}
+```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid or missing report ID |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | Report not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -403,6 +596,16 @@ Delete a power report and its outage associations.
   "data": {}
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid or missing report ID |
+| 401 | Unauthorized - missing or invalid token |
+| 404 | Report not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 

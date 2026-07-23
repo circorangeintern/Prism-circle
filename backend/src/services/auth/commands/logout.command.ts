@@ -13,13 +13,9 @@ export class LogoutCommand {
     ipAddress?: string,
     userAgent?: string,
   ): Promise<void> {
-    try {
-      const stored = await this.authRepository.findRefreshToken(refreshToken);
-      if (stored) {
-        await this.authRepository.deleteRefreshToken(refreshToken);
-      }
-    } catch {
-      // Already deleted — still a successful logout
+    const stored = await this.authRepository.findRefreshToken(refreshToken);
+    if (stored) {
+      await this.authRepository.deleteRefreshToken(refreshToken);
     }
 
     if (userId) {

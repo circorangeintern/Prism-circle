@@ -15,8 +15,8 @@ export const swaggerOptions: FastifyDynamicSwaggerOptions = {
     },
     servers: [
       {
-        url: `http://localhost:${env.port}`,
-        description: 'Local Server',
+        url: process.env.API_SERVER_URL ?? `http://localhost:${env.port}`,
+        description: process.env.API_SERVER_URL ? 'Production Server' : 'Local Server',
       },
     ],
     components: {

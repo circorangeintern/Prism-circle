@@ -164,6 +164,23 @@ export const reportRoutes: FastifyPluginAsync = async (app) => {
           limit: { type: 'integer', default: 20 },
         },
       },
+      response: {
+        200: {
+          description: 'User reports list with pagination',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: {
+                data: { type: 'array', items: { type: 'object' } },
+                pagination: { type: 'object' },
+              },
+            },
+          },
+        },
+      },
     },
   }, reportController.getUserReports);
 
@@ -181,6 +198,23 @@ export const reportRoutes: FastifyPluginAsync = async (app) => {
           limit: { type: 'integer', default: 20 },
         },
       },
+      response: {
+        200: {
+          description: 'User reports list with pagination',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: {
+                data: { type: 'array', items: { type: 'object' } },
+                pagination: { type: 'object' },
+              },
+            },
+          },
+        },
+      },
     },
   }, reportController.getReportsByLocation);
 
@@ -194,6 +228,17 @@ export const reportRoutes: FastifyPluginAsync = async (app) => {
         required: ['neighborhoodId'],
         properties: {
           neighborhoodId: { type: 'integer', example: 9012 },
+        },
+      },
+      response: {
+        200: {
+          description: 'Live power status',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
         },
       },
     },
@@ -213,6 +258,23 @@ export const reportRoutes: FastifyPluginAsync = async (app) => {
           limit: { type: 'integer', default: 20 },
         },
       },
+      response: {
+        200: {
+          description: 'List with pagination',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: {
+                data: { type: 'array', items: { type: 'object' } },
+                pagination: { type: 'object' },
+              },
+            },
+          },
+        },
+      },
     },
   }, reportController.getOutages);
 
@@ -224,6 +286,17 @@ export const reportRoutes: FastifyPluginAsync = async (app) => {
       params: {
         type: 'object', required: ['id'],
         properties: { id: { type: 'string', format: 'uuid' } },
+      },
+      response: {
+        200: {
+          description: 'Outage details',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
       },
     },
   }, reportController.getOutage);
@@ -238,6 +311,17 @@ export const reportRoutes: FastifyPluginAsync = async (app) => {
         required: ['id'],
         properties: {
           id: { type: 'string', format: 'uuid' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Outage details',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
         },
       },
     },

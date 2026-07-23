@@ -48,6 +48,15 @@ Get ON/OFF report counts, percentages, and top reported neighborhoods.
 }
 ```
 
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid date format |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
+
 ---
 
 ## Outage Statistics
@@ -75,20 +84,33 @@ Get outage counts, average duration, and top outage-prone neighborhoods.
 
 ```json
 {
-  "totalOutages": 340,
-  "activeOutages": 12,
-  "completedOutages": 328,
-  "averageDurationMinutes": 45,
-  "topNeighborhoods": [
-    {
-      "neighborhoodId": 9012,
-      "neighborhoodName": "Central",
-      "outageCount": 25,
-      "averageDurationMinutes": 60
-    }
-  ]
+  "success": true,
+  "message": "Outage statistics fetched.",
+  "data": {
+    "totalOutages": 340,
+    "activeOutages": 12,
+    "completedOutages": 328,
+    "averageDurationMinutes": 45,
+    "topNeighborhoods": [
+      {
+        "neighborhoodId": 9012,
+        "neighborhoodName": "Central",
+        "outageCount": 25,
+        "averageDurationMinutes": 60
+      }
+    ]
+  }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid date format |
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -108,28 +130,40 @@ Get user counts, verification rates, distribution by state, and top reporters.
 
 ```json
 {
-  "totalUsers": 150,
-  "verifiedUsers": 120,
-  "unverifiedUsers": 30,
-  "adminUsers": 2,
-  "verificationRate": "80.0",
-  "usersByState": [
-    {
-      "stateId": 25,
-      "stateName": "Lagos",
-      "userCount": 50
-    }
-  ],
-  "topReporters": [
-    {
-      "userId": "uuid",
-      "name": "John Doe",
-      "email": "john@example.com",
-      "reportCount": 200
-    }
-  ]
+  "success": true,
+  "message": "User statistics fetched.",
+  "data": {
+    "totalUsers": 150,
+    "verifiedUsers": 120,
+    "unverifiedUsers": 30,
+    "adminUsers": 2,
+    "verificationRate": "80.0",
+    "usersByState": [
+      {
+        "stateId": 25,
+        "stateName": "Lagos",
+        "userCount": 50
+      }
+    ],
+    "topReporters": [
+      {
+        "userId": "uuid",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "reportCount": 200
+      }
+    ]
+  }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
@@ -149,19 +183,31 @@ Get per-neighborhood breakdown with report counts, outage counts, and user count
 
 ```json
 {
-  "totalNeighborhoods": 4000,
-  "neighborhoods": [
-    {
-      "id": 9012,
-      "name": "Central",
-      "town": "Main Town",
-      "city": "Main City",
-      "lga": "Main LGA",
-      "state": "Lagos",
-      "reportCount": 150,
-      "outageCount": 25,
-      "userCount": 30
-    }
-  ]
+  "success": true,
+  "message": "Location statistics fetched.",
+  "data": {
+    "totalNeighborhoods": 4000,
+    "neighborhoods": [
+      {
+        "id": 9012,
+        "name": "Central",
+        "town": "Main Town",
+        "city": "Main City",
+        "lga": "Main LGA",
+        "state": "Lagos",
+        "reportCount": 150,
+        "outageCount": 25,
+        "userCount": 30
+      }
+    ]
+  }
 }
 ```
+
+### Possible Errors
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - missing or invalid token |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |

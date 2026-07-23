@@ -128,7 +128,10 @@ export const reportController = {
       page: Math.max(1, Number(page) || 1),
       limit: Math.min(100, Math.max(1, Number(limit) || 20)),
     };
-    if (neighborhoodId !== undefined) params.neighborhoodId = Number(neighborhoodId);
+    if (neighborhoodId !== undefined) {
+      const parsed = Number(neighborhoodId);
+      if (!isNaN(parsed)) params.neighborhoodId = parsed;
+    }
     const result = await getOutagesQuery.execute(params);
     return reply.status(200).send(successResponse(result, POWER_MESSAGES.OUTAGES_FETCHED));
   },

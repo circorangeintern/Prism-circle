@@ -75,9 +75,8 @@ export const env = {
   },
 };
 
-const isProduction = env.nodeEnv === 'production';
-if (isProduction && (!env.jwt.accessSecret || !env.jwt.refreshSecret)) {
+if (!env.jwt.accessSecret || !env.jwt.refreshSecret) {
   throw new Error(
-    'JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be set in production.',
+    'JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be set in environment variables.',
   );
 }

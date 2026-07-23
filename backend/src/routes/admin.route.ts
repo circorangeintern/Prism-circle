@@ -3,7 +3,6 @@ import { adminController } from '../controllers/admin.controller.js';
 import { authMiddleware, adminMiddleware } from '../middlewares/auth.middleware.js';
 
 export const adminRoutes: FastifyPluginAsync = async (app) => {
-  app.addHook('preHandler', authMiddleware);
 
   app.get('/dashboard', {
     preHandler: [adminMiddleware],
@@ -50,6 +49,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
           endDate: { type: 'string', format: 'date-time' },
         },
       },
+      response: {
+        200: {
+          description: 'Analytics data',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, adminController.getAnalytics);
 
@@ -68,6 +78,23 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
           role: { type: 'string', enum: ['USER', 'ADMIN'] },
         },
       },
+      response: {
+        200: {
+          description: 'List with pagination',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: {
+                data: { type: 'array', items: { type: 'object' } },
+                pagination: { type: 'object' },
+              },
+            },
+          },
+        },
+      },
     },
   }, adminController.getUsers);
 
@@ -77,6 +104,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
       description: '[ADMIN] Get all location hierarchy data.',
       tags: ['Admin'],
       summary: 'List locations',
+      response: {
+        200: {
+          description: 'Location hierarchy data',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, adminController.getLocations);
 
@@ -93,6 +131,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
           type: { type: 'string', enum: ['state', 'lga', 'city', 'town', 'neighborhood'] },
           id: { type: 'integer' },
           name: { type: 'string' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Location hierarchy data',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
         },
       },
     },
@@ -113,6 +162,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
           topic: { type: 'string' },
         },
       },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, adminController.sendBroadcast);
 
@@ -125,6 +185,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
       params: {
         type: 'object', required: ['userId'],
         properties: { userId: { type: 'string', format: 'uuid' } },
+      },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
       },
     },
   }, adminController.suspendUser);
@@ -139,6 +210,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
         type: 'object', required: ['userId'],
         properties: { userId: { type: 'string', format: 'uuid' } },
       },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, adminController.deleteUser);
 
@@ -151,6 +233,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
       params: {
         type: 'object', required: ['id'],
         properties: { id: { type: 'string', format: 'uuid' } },
+      },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
       },
     },
   }, adminController.deleteReport);
@@ -168,6 +261,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
           date: { type: 'string', format: 'date', description: 'Date (YYYY-MM-DD). Defaults to today.' },
         },
       },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, adminController.materializeDaily);
 
@@ -183,6 +287,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
           weekStart: { type: 'string', format: 'date', description: 'Monday of the week (YYYY-MM-DD).' },
         },
       },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
+        },
+      },
     },
   }, adminController.materializeWeekly);
 
@@ -196,6 +311,17 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
         type: 'object',
         properties: {
           monthStart: { type: 'string', format: 'date', description: 'First of the month (YYYY-MM-DD).' },
+        },
+      },
+      response: {
+        200: {
+          description: 'Success description',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+          },
         },
       },
     },
